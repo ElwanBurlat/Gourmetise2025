@@ -18,7 +18,7 @@
             color="primary"
             variant="flat"
             block
-            @click="router.push('/concours')"
+            @click="goToSeeConcours()"
           >
             Voir les concours
           </v-btn>
@@ -42,7 +42,7 @@
             color="success"
             variant="flat"
             block
-            @click="router.push('/contestparams')"
+            @click="goToCreateConcours()"
           >
             Créer un concours
           </v-btn>
@@ -54,6 +54,17 @@
 </v-container>
 </template>
 <script setup >
+import { useRouter } from 'vue-router'
+const router = useRouter()
+
+function goToCreateConcours() {
+  router.push('/CreateConcours')
+}
+
+function goToSeeConcours() {
+  router.push('/SeeConcours')
+}
+
 
 
 

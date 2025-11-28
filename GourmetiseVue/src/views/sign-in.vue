@@ -1,11 +1,19 @@
 <template>
     <v-snackbar
-        v-model="snackbar"
+        v-model="snackbarGreen"
         color="success"
         timeout="2500"
         location="top"
         >
-        🎉 Votre boulangerie a été enregistrée !
+         Votre boulangerie a été enregistrée 
+    </v-snackbar>
+    <v-snackbar
+        v-model="snackbarRed"
+        color="error"
+        timeout="2500"
+        location="top"
+        >
+         Erreur votre erreur n'as pas été enregistrer  
     </v-snackbar>
     <v-container>
         <v-row>
@@ -27,14 +35,26 @@
                     v-model="adress"
                     label="Adresse"
                 />
+                <v-select
+                    v-model="city"
+                    :items="cities"
+                    label="Ville"
+                    v-if="cities.length > 1"
+                />
+
                 <v-text-field
                     v-model="city"
                     label="Ville"
+                    readonly
+                    v-else
                 />
+
                 <v-text-field
                     v-model="postalcode"
                     label="Code Postal"
+                    @input="findCity"
                 />
+
                 <v-select
                     clearable
                     label="Pays"
@@ -53,6 +73,7 @@
                     v-model="description"
                     label="Description"
                 ></v-textarea>
+                <v-checkbox label="J’accepte le traitement de mes données."></v-checkbox>
 
                 <v-btn color="primary" @click="fetchPosts">Valider</v-btn>
             </v-col>
@@ -74,10 +95,35 @@ const description = ref('')
 const country =ref('')
 const adress = ref('')
 const router = useRouter()
-const snackbar = ref(false)
+const snackbarGreen = ref(false)
+const snackbarRed= ref(false)
+const cities= ref([])
 
 const fetchPosts = async () => {
-  try {
+    if (
+    siret.value=='' ||
+    companyName.value=='' ||
+    phone.value=='' ||
+    adress.value=='' ||
+    city.value=='' ||
+    postalcode.value=='' ||
+    country.value=='' ||
+    nameContact.value=='' ||
+    phoneContact.value=='' ||
+    description.value==''
+    ) 
+    {
+        return alert("Il manque des champs");
+    }
+
+    if(siret.value.length !== 15 && siret.value.length !== 9){
+        return alert("Le numero siret n'est pas bon");
+    }
+
+  
+  
+  
+    try {
     const response = await axios.post(
       'http://localhost:8000/api/bakery',
       {
@@ -98,15 +144,32 @@ const fetchPosts = async () => {
     )
      console.log('Données envoyées avec succès :', response.data)
     
-    snackbar.value = true
+    snackbarGreen.value = true
     setTimeout(() => {
         router.push('/')
     }, 2500) 
    
   } catch (error) {
     console.error('Erreur lors de l’envoi :', error)
+    
+    snackbarRed.value =true;
+    setTimeout(() => {}, 2500) 
   }
+}
+const findCity = async () => {
+  
+    const response = await axios.get(`https://geo.api.gouv.fr/communes?codePostal=${postalcode.value}`)
+    cities.value = response.data.map(v => v.nom)
+    if (cities.value.length === 1) {
+    city.value = cities.value[0]
+    } else {
+    city.value = ""
+    }
+
+  
 }
 
 
+
 </script>
+
