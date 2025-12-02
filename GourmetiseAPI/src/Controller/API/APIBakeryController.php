@@ -69,6 +69,8 @@ final class APIBakeryController extends AbstractController
             }
             // enregistrer le Bakery dans la base de données
             $bakery->setBakeryUser($user);
+            $bakery->setDataConsent(new \DateTimeImmutable());
+            $bakery->setDataDecline(null);
             $entityManager->persist($bakery); //Pour preparer la sauvegarde de  cet objet dans la bdd
             $entityManager->flush(); //executer les operations pour rentrer l'objet dans la BDD
 

@@ -13,9 +13,9 @@
         timeout="2500"
         location="top"
         >
-         Erreur votre erreur n'as pas été enregistrer  
+         Erreur votre Boulagerie n'as pas été enregistrer  
     </v-snackbar>
-    <v-container>
+    <v-container class="v-container">
         <v-row>
             <v-col>
                 <h1>Inscrire sa boulangerie</h1>
@@ -35,6 +35,11 @@
                     v-model="adress"
                     label="Adresse"
                 />
+                <v-text-field
+                    v-model="postalcode"
+                    label="Code Postal"
+                    @input="findCity"
+                />
                 <v-select
                     v-model="city"
                     :items="cities"
@@ -49,18 +54,7 @@
                     v-else
                 />
 
-                <v-text-field
-                    v-model="postalcode"
-                    label="Code Postal"
-                    @input="findCity"
-                />
-
-                <v-select
-                    clearable
-                    label="Pays"
-                    :items="['France']"
-                    v-model="country"
-                ></v-select>
+                
                 <v-text-field
                     v-model="nameContact"
                     label="Nom du Contact"
@@ -73,13 +67,19 @@
                     v-model="description"
                     label="Description"
                 ></v-textarea>
-                <v-checkbox label="J’accepte le traitement de mes données."></v-checkbox>
+                <v-checkbox v-model="dataConsent" label="J’accepte le traitement de mes données."></v-checkbox>
 
                 <v-btn color="primary" @click="fetchPosts">Valider</v-btn>
             </v-col>
         </v-row>
     </v-container>
 </template>
+<style>
+.v-container {
+    width: 100vw;
+    height: 100vw;
+}
+</style>
 <script setup>
 import { useRouter } from 'vue-router'
 import axios from 'axios';
@@ -92,12 +92,12 @@ const postalcode = ref('')
 const nameContact = ref('')
 const phoneContact = ref('')
 const description = ref('')
-const country =ref('')
 const adress = ref('')
 const router = useRouter()
 const snackbarGreen = ref(false)
 const snackbarRed= ref(false)
 const cities= ref([])
+const dataConsent = ref(false) 
 
 const fetchPosts = async () => {
     if (
@@ -107,7 +107,6 @@ const fetchPosts = async () => {
     adress.value=='' ||
     city.value=='' ||
     postalcode.value=='' ||
-    country.value=='' ||
     nameContact.value=='' ||
     phoneContact.value=='' ||
     description.value==''
@@ -120,6 +119,9 @@ const fetchPosts = async () => {
         return alert("Le numero siret n'est pas bon");
     }
 
+    if (!dataConsent.value) {
+        return alert("Vous devez accepter le traitement des données.");
+    }
   
   
   
@@ -133,7 +135,6 @@ const fetchPosts = async () => {
         adress: adress.value,
         city: city.value,
         postalcode: parseInt(postalcode.value, 5),
-        country: country.value,
         nameContact: nameContact.value,
         phoneContact: phoneContact.value,
         description: description.value,

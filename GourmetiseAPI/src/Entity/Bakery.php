@@ -34,9 +34,7 @@ class Bakery
     #[ORM\Column]
     private ?int $postalcode = null;
 
-    #[Groups(['Bakery:Write'])]
-    #[ORM\Column(length: 50)]
-    private ?string $country = null;
+   
 
     #[Groups(['Bakery:Write'])]
     #[ORM\Column(length: 55)]
@@ -53,6 +51,12 @@ class Bakery
     #[ORM\OneToOne()]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $bakeryUser = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $data_consent = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $data_decline = null;
 
    
     public function getSiret(): ?string
@@ -127,17 +131,7 @@ class Bakery
         return $this;
     }
 
-    public function getCountry(): ?string
-    {
-        return $this->country;
-    }
-
-    public function setCountry(string $country): static
-    {
-        $this->country = $country;
-
-        return $this;
-    }
+    
 
     public function getNameContact(): ?string
     {
@@ -183,6 +177,30 @@ class Bakery
     public function setBakeryUser(User $bakeryUser): static
     {
         $this->bakeryUser = $bakeryUser;
+
+        return $this;
+    }
+
+    public function getDataConsent(): ?\DateTimeImmutable
+    {
+        return $this->data_consent;
+    }
+
+    public function setDataConsent(?\DateTimeImmutable $data_consent): static
+    {
+        $this->data_consent = $data_consent;
+
+        return $this;
+    }
+
+    public function getDataDecline(): ?\DateTimeImmutable
+    {
+        return $this->data_decline;
+    }
+
+    public function setDataDecline(?\DateTimeImmutable $data_decline): static
+    {
+        $this->data_decline = $data_decline;
 
         return $this;
     }
