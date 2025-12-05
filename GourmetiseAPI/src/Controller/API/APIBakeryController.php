@@ -44,28 +44,27 @@ final class APIBakeryController extends AbstractController
             $siret=$bakery->getSiret();
             $email =$bakery->getBakeryUser()->getEmail();
             $user = $entityManager->getRepository(User::class)->findOneBy(['email' => $email]);
-            var_dump($user);
             $contestParams = $entityManager->getRepository(ContestParams::class)->find(1);
             
             if($contestParams->getStatus()!==Status::REGISTRATION_OPEN){
-                return new JsonResponse(['message'=>'Status not correct'], Response::HTTP_CONFLICT);
+                return new JsonResponse(['message'=>'Status not correct'], Response::HTTP_BAD_REQUEST);
             }
             if($user ==null){
-                return new JsonResponse(['message'=>'email not exist'], Response::HTTP_CONFLICT); 
+                return new JsonResponse(['message'=>'email not exist'], Response::HTTP_BAD_REQUEST); 
             }
             
             if ($user->getRole() !== 'ROLE_BAKER') {
-                return new JsonResponse(['message' => 'User is not a bakery'], 403);
+                return new JsonResponse(['message' => 'User is not a bakery'], Response::HTTP_BAD_REQUEST);
             }
             
             $existeForUser=$repository->findOneBy(['bakeryUser' => $user]);
             if($existeForUser !== null){
-                return new JsonResponse(['message'=>'User has already a bakery'], Response::HTTP_CONFLICT);
+                return new JsonResponse(['message'=>'User has already a bakery'], Response::HTTP_BAD_REQUEST);
             }
             
             $existingbakery = $repository->find($siret);
             if($existingbakery){
-                return new JsonResponse(['message'=>'Siret already exist'], Response::HTTP_CONFLICT);
+                return new JsonResponse(['message'=>'Siret already exist'], Response::HTTP_BAD_REQUEST);
             }
             // enregistrer le Bakery dans la base de données
             $bakery->setBakeryUser($user);

@@ -13,7 +13,7 @@
         timeout="2500"
         location="top"
         >
-         Erreur votre Boulagerie n'as pas été enregistrer  
+         Erreur votre Boulangerie n'as pas été enregistrée {{ snackbarText }}  
     </v-snackbar>
     <v-container class="v-container">
         <v-row>
@@ -96,6 +96,7 @@ const adress = ref('')
 const router = useRouter()
 const snackbarGreen = ref(false)
 const snackbarRed= ref(false)
+const snackbarText=ref('')
 const cities= ref([])
 const dataConsent = ref(false) 
 
@@ -139,7 +140,20 @@ const fetchPosts = async () => {
         phoneContact: phoneContact.value,
         description: description.value,
         bakeryUser: {
-          email: "Baker1.martin@gourmetise.com"  
+          email: "Martin.martin@gourmetise.com"  
+        
+        // Utilisateur non inscrit (cas status pas bon (changer le status) et cas ou le siret est  DEJA UTILISER )
+        // email: "Baker2.martin@gourmetise.com"
+
+        // Utilisateur n'existe pas  (cas ou l'email n'existe pas)
+        // email: "marie.leroy@example.com"
+
+        // Utilisateur inscrit   (cas ou il y a deja une bakery )
+        // email: "Baker1.martin@gourmetise.com"
+
+        // Utilisateur Admin   (cas ou il n'as pas le role baker )
+        // email: "Martin.martin@gourmetise.com"
+
         }
       }
     )
@@ -151,8 +165,8 @@ const fetchPosts = async () => {
     }, 2500) 
    
   } catch (error) {
-    console.error('Erreur lors de l’envoi :', error)
-    
+    console.error('Erreur lors de l’envoi :', error.response.data.message)
+    snackbarText.value = error.response.data.message ;
     snackbarRed.value =true;
     setTimeout(() => {}, 2500) 
   }
