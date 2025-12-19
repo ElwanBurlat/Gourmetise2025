@@ -1,6 +1,7 @@
 package com.example.gourmetise
 
 import GourmetiseDAO
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -67,6 +68,12 @@ class MainActivity : ComponentActivity() {
             GourmetiseTheme {
                 val context = LocalContext.current
                 var bdd = GourmetiseDAO(context = context);
+                val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                var alreadyImported by remember {
+                    mutableStateOf(prefs.getBoolean("import_done", false))
+                }
+
+
                 Scaffold(
                     topBar = {
                         TopAppBar(
@@ -92,13 +99,18 @@ class MainActivity : ComponentActivity() {
                                     ) {
                                         // Bouton IMPORTER
                                         Button(
-                                            onClick = { val clientHTTP = OkHttpClient()
+                                            onClick = {
+
+
+                                                val clientHTTP = OkHttpClient()
                                                 val request = Request.Builder()
                                                     .url("http://10.0.2.2:8000/api/bakery")
                                                     .build()
                                                 // Exécuter la requête en asynchrone
                                                 clientHTTP.newCall(request).enqueue(object : okhttp3.Callback {
                                                     override fun onFailure(call: okhttp3.Call, e: IOException) {
+
+
                                                         runOnUiThread {
                                                             Toast.makeText(context, "ECHEC IMPORT ! "+e.toString(),
                                                                 Toast.LENGTH_SHORT).show()
@@ -127,12 +139,24 @@ class MainActivity : ComponentActivity() {
                                                                 b.description = jsonObject.getString("description")
                                                                 bdd.ajouterBakery(b)
                                                             }
+                                                            prefs.edit().putBoolean("import_done", true).apply()
+                                                            alreadyImported=true
                                                             runOnUiThread { Toast.makeText(context, "IMPORT REUSSI !",
                                                                 Toast.LENGTH_SHORT).show()
-                                                                val intent = Intent(context,touteLesBakery::class.java)
-                                                                context.startActivity(intent)
                                                             }
                                                         } else {
+                                                            if (response.code == 403) {
+                                                                runOnUiThread {
+                                                                    Toast.makeText(
+                                                                        context,
+                                                                        "Hors période d’évaluation",
+                                                                        Toast.LENGTH_LONG
+                                                                    ).show()
+                                                                    Log.i("erreur", "403 - Hors période d’évaluation")
+                                                                }
+                                                                return
+                                                            }
+
                                                             runOnUiThread { Toast.makeText(context, "ECHEC IMPORT !\n" +
                                                                     response.code.toString()+ " "
                                                                     +response.message, Toast.LENGTH_SHORT).show()
@@ -141,12 +165,13 @@ class MainActivity : ComponentActivity() {
                                                         }
                                                     }
                                                 }) },
+                                            enabled = !alreadyImported,
                                             modifier = Modifier
                                                 .padding(12.dp)
                                                 .width(120.dp)
                                         )
                                         {
-                                            Text("IMPORTER")
+                                            Text(if (alreadyImported) "DÉJÀ IMPORTÉ" else "IMPORTER")
                                         }
 
                                     }
@@ -183,6 +208,29 @@ fun AccueilUI(modifier: Modifier = Modifier) {
                 .padding(top = 20.dp)
                 .align(alignment = Alignment.CenterHorizontally)
         )
+        Button(
+            onClick = {
+                val bdd = GourmetiseDAO(context)
+
+                if (bdd.nombreDeBakery() == 0) {
+                    Toast.makeText(
+                        context,
+                        "Aucune boulangerie importée",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    val intent = Intent(context, touteLesBakery::class.java)
+                    context.startActivity(intent)
+                }
+            },
+            modifier = Modifier
+                .padding(12.dp)
+                .width(180.dp)
+        ) {
+            Text("VOIR LES BOULANGERIES")
+        }
+
+
 
 
     }

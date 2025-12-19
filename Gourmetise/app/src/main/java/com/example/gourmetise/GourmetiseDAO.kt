@@ -3,6 +3,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import com.example.gourmetise.Bakery
+import com.example.gourmetise.Evaluation
 
 
 class GourmetiseDAO (context : Context) {
@@ -12,9 +13,27 @@ class GourmetiseDAO (context : Context) {
         monHelper = GourmetiseHelper(context);
         maBase = monHelper.writableDatabase;
     }
+    fun ajouterEvaluation(uneEvaluation:Evaluation){
+        val e = ContentValues()
 
+        e.put("code", uneEvaluation.code)
+        e.put("welcome", uneEvaluation.welcome)
+        e.put("shopPresentation", uneEvaluation.shopPresentation)
+        e.put("productQuality", uneEvaluation.productQuality)
+
+        maBase.insert("Evaluation", null, e)
+
+    }
     fun supprimerToutesLesBakery() {
         maBase.delete("Bakery", null, null)
+    }
+
+    fun nombreDeBakery(): Int {
+        val cursor = maBase.rawQuery("SELECT COUNT(*) FROM Bakery", null)
+        cursor.moveToFirst()
+        val count = cursor.getInt(0)
+        cursor.close()
+        return count
     }
 
     fun ajouterBakery(uneBakery: Bakery) {
@@ -77,4 +96,7 @@ class GourmetiseDAO (context : Context) {
         return lesBakery
     }
 
+}
+
+class Evaluation {
 }

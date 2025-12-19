@@ -4,10 +4,13 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-class User
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -104,5 +107,29 @@ class User
         $this->role = $role;
 
         return $this;
+    }
+
+    public function getUserIdentifier(): string
+    {
+        throw new \Exception('Not implemented');
+    }
+
+    public function getPassword(): ?string
+    {
+        throw new \Exception('Not implemented');
+    }
+
+    public function setPassword(string $password) {
+
+    }
+
+    public function eraseCredentials(): void
+    {
+        throw new \Exception('Not implemented');
+    }
+
+    public function getRoles(): array
+    {
+        throw new \Exception('Not implemented');
     }
 }

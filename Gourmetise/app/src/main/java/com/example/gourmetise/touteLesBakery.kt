@@ -1,10 +1,14 @@
 package com.example.gourmetise
 import GourmetiseDAO
+import android.R.attr.enabled
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,16 +20,25 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -35,6 +48,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.gourmetise.ui.theme.GourmetiseTheme
 import com.example.gourmetise.ui.theme.PurpleGrey40
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 
 
 class touteLesBakery : ComponentActivity() {
@@ -54,39 +70,159 @@ class touteLesBakery : ComponentActivity() {
 
 @Composable
 fun ClassementUI(modifier: Modifier = Modifier) {
+
     val context = LocalContext.current
-    var bdd = GourmetiseDAO(context = context);
-    var lesBakery = bdd.toutesLesBakery()
+    val bdd = GourmetiseDAO(context = context)
+    val lesBakery = bdd.toutesLesBakery()
+
+    var showPopup by remember { mutableStateOf(false) }
+    var evaluation by remember { mutableStateOf(Evaluation()) }
 
 
+    var welcome by remember { mutableStateOf(0) }
+    var shopPresentation by remember { mutableStateOf(0) }
+    var productQuality by remember { mutableStateOf(0) }
+    var codeTicket by remember {mutableStateOf("")}
+    Box(modifier = Modifier.fillMaxSize()) {
 
-    Column(
-        verticalArrangement = Arrangement.Top,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(top=50.dp,start=16.dp, end = 16.dp)
 
-    ) {
-        Text(
-            text = "Liste des boulangeries",
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
         Column(
+            verticalArrangement = Arrangement.Top,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 50.dp, start = 16.dp, end = 16.dp)
+        ) {
+
+            Text(
+                text = "Liste des boulangeries",
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+
+            Column(
                 modifier = Modifier
                     .verticalScroll(rememberScrollState())
                     .fillMaxWidth()
-                ){
-            lesBakery.forEach { bakery ->
-                BakeryCard(bakery)
+            ) {
+                lesBakery.forEach { bakery ->
+                    BakeryCard(
+                        bakery = bakery,
+                        onShowPopup = { codeSaisi ->
+                            evaluation.code = codeSaisi
+
+
+                            showPopup = true
+                        }
+                    )
+                }
+            }
+        }
+
+
+        if (showPopup) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.4f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Card(
+                    shape = RoundedCornerShape(20.dp),
+                    modifier = Modifier.fillMaxWidth(0.9f)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+
+                        Text(
+                            text = "Évaluer la boulangerie",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Text("Accueil")
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            for (i in 1..5) {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    RadioButton(
+                                        selected = welcome == i,
+                                        onClick = { welcome = i }
+                                    )
+                                    Text(i.toString())
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text("Présentation du magasin")
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            for (i in 1..5) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    RadioButton(
+                                        selected = shopPresentation == i,
+                                        onClick = { shopPresentation = i }
+                                    )
+                                    Text(i.toString())
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text("Qualité des produits")
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            for (i in 1..5) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    RadioButton(
+                                        selected = productQuality == i,
+                                        onClick = { productQuality = i }
+                                    )
+                                    Text(i.toString())
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Button(
+                            onClick = {
+                                evaluation.welcome=welcome;
+                                evaluation.productQuality=productQuality;
+                                evaluation.shopPresentation=shopPresentation;
+                                showPopup = false
+
+                                bdd.ajouterEvaluation(evaluation)
+                            }
+                        ) {
+                            Text("Valider")
+                        }
+                    }
+                }
             }
         }
     }
-
 }
+
 @Composable
-fun BakeryCard(bakery: Bakery) {
+fun BakeryCard(bakery: Bakery, onShowPopup: (String) -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    var code by remember { mutableStateOf("") }
 
     Card(
         modifier = Modifier
@@ -98,6 +234,7 @@ fun BakeryCard(bakery: Bakery) {
 
         Column(modifier = Modifier.padding(16.dp)) {
 
+
             // NOM DE LA BAKERY
             Text(
                 text = bakery.companyName,
@@ -107,13 +244,6 @@ fun BakeryCard(bakery: Bakery) {
             )
 
             Spacer(modifier = Modifier.height(8.dp))
-
-            // SIRET
-            Text(
-                text = "SIRET : ${bakery.siret}",
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.secondary
-            )
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -171,9 +301,65 @@ fun BakeryCard(bakery: Bakery) {
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.outline
             )
+
+
+
+
+            IconButton(
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally),
+                onClick = { expanded = !expanded }
+            ) {
+                Icon(
+                    imageVector = if (expanded)
+                        Icons.Default.KeyboardArrowUp
+                    else
+                        Icons.Default.KeyboardArrowDown,
+                    contentDescription = null
+                )
+            }
+
+            AnimatedVisibility(visible = expanded) {
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+
+                    TextField(
+                        value = code,
+                        onValueChange = { code = it },
+                        modifier = Modifier.fillMaxWidth(0.9f)
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Button(
+                        onClick = {
+                            onShowPopup(code)
+                        },
+                        enabled = code.isNotBlank()
+                    ) {
+                        Text("Entrer le code")
+                    }
+                }
+            }
+
+        }
+
+
+
+
         }
     }
-}
+
+
+
+
+
+
 @Preview(showBackground = true)
 @Composable
 fun BakeryCardPreview() {
@@ -187,7 +373,12 @@ fun BakeryCardPreview() {
         bakery.nameContact = "Pierre Dupont"
         bakery.phoneContact = "0123456790"
         bakery.description = "Boulangerie artisanale"
-        BakeryCard(bakery)
+        BakeryCard(
+            bakery = bakery,
+            onShowPopup = { }
+        )
+
+
     }
 }
 

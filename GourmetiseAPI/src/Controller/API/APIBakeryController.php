@@ -21,9 +21,21 @@ final class APIBakeryController extends AbstractController
 {
     
     #[Route('/api/bakery', methods :["GET"])]
-    public function getbakery(BakeryRepository $repository) : JsonResponse
+    public function getbakery(
+        ContestParamsRepository $contestParamsRepository,
+        BakeryRepository $repository
+        
+        ) : JsonResponse
     {
         $bakery = $repository->findAll();
+        $contestParams = $contestParamsRepository->find(1);
+
+        if ($contestParams->getStatus() !== Status::EVALUATION_OPEN) {
+        return new JsonResponse(
+            ['message' => 'Hors période d’évaluation'],
+            Response::HTTP_BAD_REQUEST
+        );
+    }
         return $this->json($bakery, Response::HTTP_OK, [], ['groups' => ['Bakery:Write']]);
     }
     

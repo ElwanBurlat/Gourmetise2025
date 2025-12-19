@@ -15,9 +15,18 @@ class GourmetiseHelper (context : Context)
                 + "nameContact TEXT NOT NULL,"
                 + "phoneContact TEXT NOT NULL,"
                 + "description TEXT NOT NULL);");
+
+        db.execSQL("CREATE TABLE Evaluation ("
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + "code TEXT NOT NULL ,"
+                + "welcome REAL NOT NULL,"
+                + "shopPresentation REAL NOT NULL,"
+                + "productQuality REAL NOT NULL);");
+
     }
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         db.execSQL("DROP TABLE IF EXISTS Bakery;");
+        db.execSQL("DROP TABLE IF EXISTS Evaluation;")
         onCreate(db);
     }
 }
