@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.sp
 import com.example.gourmetise.ui.theme.GourmetiseTheme
 import com.example.gourmetise.ui.theme.PurpleGrey40
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 
@@ -79,9 +80,9 @@ fun ClassementUI(modifier: Modifier = Modifier) {
     var evaluation by remember { mutableStateOf(Evaluation()) }
 
 
-    var welcome by remember { mutableStateOf(0) }
-    var shopPresentation by remember { mutableStateOf(0) }
-    var productQuality by remember { mutableStateOf(0) }
+    var welcome by remember { mutableFloatStateOf(0F) }
+    var shopPresentation by remember { mutableFloatStateOf(0F) }
+    var productQuality by remember { mutableFloatStateOf(0F) }
     var codeTicket by remember {mutableStateOf("")}
     Box(modifier = Modifier.fillMaxSize()) {
 
@@ -154,8 +155,8 @@ fun ClassementUI(modifier: Modifier = Modifier) {
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
                                     RadioButton(
-                                        selected = welcome == i,
-                                        onClick = { welcome = i }
+                                        selected = welcome == i.toFloat(),
+                                        onClick = { welcome = i.toFloat() }
                                     )
                                     Text(i.toString())
                                 }
@@ -172,8 +173,8 @@ fun ClassementUI(modifier: Modifier = Modifier) {
                             for (i in 1..5) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     RadioButton(
-                                        selected = shopPresentation == i,
-                                        onClick = { shopPresentation = i }
+                                        selected = shopPresentation == i.toFloat(),
+                                        onClick = { shopPresentation = i.toFloat() }
                                     )
                                     Text(i.toString())
                                 }
@@ -190,8 +191,8 @@ fun ClassementUI(modifier: Modifier = Modifier) {
                             for (i in 1..5) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     RadioButton(
-                                        selected = productQuality == i,
-                                        onClick = { productQuality = i }
+                                        selected = productQuality == i.toFloat(),
+                                        onClick = { productQuality = i.toFloat() }
                                     )
                                     Text(i.toString())
                                 }

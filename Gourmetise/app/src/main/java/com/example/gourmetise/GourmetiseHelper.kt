@@ -2,7 +2,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 class GourmetiseHelper (context : Context)
-    : SQLiteOpenHelper (context, "baseGourmetise.db", null, 2){
+    : SQLiteOpenHelper (context, "baseGourmetise.db", null, 3){
     override fun onCreate(db: SQLiteDatabase) {
         // création des tables de la base embarquée
         // création de la table CONCURRENT
