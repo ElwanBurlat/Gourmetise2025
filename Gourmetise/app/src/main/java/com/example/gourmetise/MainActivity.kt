@@ -169,7 +169,7 @@ class MainActivity : ComponentActivity() {
                                                 .width(120.dp)
                                         )
                                         {
-                                            Text(if (alreadyImported) "DÉJÀ IMPORT" else "IMPORTE")
+                                            Text(if (alreadyImported) "DÉJÀ IMPORTÉ" else "IMPORTÉ")
                                         }
 
 
