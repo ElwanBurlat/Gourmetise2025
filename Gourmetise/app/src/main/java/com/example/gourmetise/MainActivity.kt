@@ -56,6 +56,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.traceEventStart
 import kotlin.jvm.java
 
 
@@ -168,8 +169,9 @@ class MainActivity : ComponentActivity() {
                                                 .width(120.dp)
                                         )
                                         {
-                                            Text(if (alreadyImported) "DÉJÀ IMPORTÉ" else "IMPORTER")
+                                            Text(if (alreadyImported) "DÉJÀ IMPORT" else "IMPORTE")
                                         }
+
 
                                     }
                                 }
