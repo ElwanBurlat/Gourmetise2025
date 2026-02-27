@@ -30,7 +30,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $email = null;
 
     #[Groups(['User:Write'])]
-    #[ORM\Column(length: 50)]
+    #[ORM\Column(length: 512)]
     private ?string $passwordHash = null;
 
     #[Groups(['User:Write'])]
@@ -111,25 +111,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getUserIdentifier(): string
     {
-        throw new \Exception('Not implemented');
+        return $this->getEmail();
     }
 
     public function getPassword(): ?string
     {
-        throw new \Exception('Not implemented');
+       return $this->passwordHash;
     }
 
     public function setPassword(string $password) {
-
+        $this->passwordHash = $password;
     }
 
     public function eraseCredentials(): void
     {
-        throw new \Exception('Not implemented');
+
     }
 
     public function getRoles(): array
     {
-        throw new \Exception('Not implemented');
+        return [$this->role, 'ROLE_USER'];
     }
 }
