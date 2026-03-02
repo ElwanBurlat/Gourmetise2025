@@ -124,6 +124,7 @@
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "git-widget-placeholder": "JWT",
     "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "project.propVCSSupport.Confirmation",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -147,6 +148,7 @@
       <workItem from="1772093627757" duration="11493000" />
       <workItem from="1772175651044" duration="871000" />
       <workItem from="1772176537174" duration="5527000" />
+      <workItem from="1772438945077" duration="2855000" />
     </task>
     <servers />
   </component>
