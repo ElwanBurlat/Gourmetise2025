@@ -25,22 +25,20 @@ class Evaluation
     #[ORM\Column]
     private ?float $productQuality = null;
 
-    #[ORM\ManyToOne()]
-    #[ORM\JoinColumn(nullable:false)]
     #[ORM\Column(length: 15)]
-    private ?Bakery $bakery_id = null;
+    private ?string $bakery_id = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getCode(): ?float
+    public function getCode(): ?string
     {
         return $this->code;
     }
 
-    public function setCode(float $code): static
+    public function setCode(string $code): static
     {
         $this->code = $code;
 
@@ -83,12 +81,12 @@ class Evaluation
         return $this;
     }
 
-    public function getBakeryId(): ?int
+    public function getBakeryId(): ?string
     {
         return $this->bakery_id;
     }
 
-    public function setBakeryId(int $bakery_id): static
+    public function setBakeryId(string $bakery_id): static
     {
         $this->bakery_id = $bakery_id;
 

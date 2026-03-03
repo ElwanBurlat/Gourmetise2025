@@ -209,7 +209,7 @@ fun ClassementUI(modifier: Modifier = Modifier) {
                                 evaluation.productQuality = productQuality
                                 evaluation.shopPresentation = shopPresentation
                                 showPopup = false
-                                bdd.ajouterEvaluation(evaluation)
+                                bdd.ajouterEvaluation(evaluation,evaluation.bakery_id)
                             }
                         ) {
                             Text("Valider")
@@ -225,8 +225,8 @@ fun ClassementUI(modifier: Modifier = Modifier) {
 fun BakeryCard(bakery: Bakery, onShowPopup: (String, String) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
     var code by remember { mutableStateOf("") }
-    var isLoading by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val bdd = GourmetiseDAO(context = context)
 
     Card(
         modifier = Modifier
@@ -299,49 +299,22 @@ fun BakeryCard(bakery: Bakery, onShowPopup: (String, String) -> Unit) {
 
                     Button(
                         onClick = {
-                            isLoading = true
-                            val clientHTTP = OkHttpClient()
-                            val body = """{"code": "$code", "bakery_id": "${bakery.siret}"}"""
-                            val requestBody = body.toRequestBody("application/json".toMediaType())
-                            val request = Request.Builder()
-                                .url("http://10.0.2.2/api/evaluation-code/verify")
-                                .post(requestBody)
-                                .build()
-
-                            clientHTTP.newCall(request).enqueue(object : okhttp3.Callback {
-                                override fun onFailure(call: okhttp3.Call, e: IOException) {
-                                    Log.e("HTTP_ERROR", "Erreur : ${e.message}")
-                                    Handler(Looper.getMainLooper()).post {
-                                        isLoading = false
-                                        Toast.makeText(context, "Erreur réseau : ${e.message}", Toast.LENGTH_SHORT).show()
-                                    }
-                                }
-
-                                override fun onResponse(call: okhttp3.Call, response: Response) {
-                                    val flux = response.body!!.string()
-                                    Log.e("HTTP_RESPONSE", "Code: ${response.code} | Body: $flux")
-
-                                    Handler(Looper.getMainLooper()).post {
-                                        isLoading = false
-                                        try {
-                                            val json = JSONObject(flux)
-                                            val isValid = json.getBoolean("valid")
-                                            if (isValid) {
-                                                onShowPopup(code, bakery.siret) // ✅ ouvre la box
-                                            } else {
-                                                Toast.makeText(context, json.getString("message"), Toast.LENGTH_SHORT).show() // ❌ message d'erreur
-                                            }
-                                        } catch (e: Exception) {
-                                            Log.e("HTTP_ERROR", "Réponse invalide : $flux")
-                                            Toast.makeText(context, "Erreur serveur : ${response.code}", Toast.LENGTH_SHORT).show()
-                                        }
-                                    }
-                                }
-                            })
-                        },
-                        enabled = code.isNotBlank() && !isLoading
+                           val codeExiste = bdd.verifierCode(code)
+                            val evaluationExiste=bdd.verifierVote(bakery.siret)
+                            if (evaluationExiste)
+                            {
+                                Toast.makeText(context, "Vous avez déjà évalué cette boulangerie !", Toast.LENGTH_SHORT).show()
+                            }
+                            else if (!codeExiste)
+                            {
+                                onShowPopup(code, bakery.siret)                            }
+                            else
+                            {
+                                Toast.makeText(context, "Code déja utilisé", Toast.LENGTH_SHORT).show()
+                            } },
+                        enabled = code.isNotBlank()
                     ) {
-                        Text(if (isLoading) "Vérification..." else "Entrer le code")
+                        Text("Entrer le code")
                     }
                 }
             }

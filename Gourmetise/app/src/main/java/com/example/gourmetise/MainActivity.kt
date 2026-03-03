@@ -57,6 +57,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.traceEventStart
+import okhttp3.MediaType.Companion.toMediaType
 import kotlin.jvm.java
 
 
@@ -163,7 +164,7 @@ class MainActivity : ComponentActivity() {
                                                         }
                                                     }
                                                 }) },
-                                            enabled = !alreadyImported,
+
                                             modifier = Modifier
                                                 .padding(12.dp)
                                                 .width(120.dp)
@@ -171,7 +172,58 @@ class MainActivity : ComponentActivity() {
                                         {
                                             Text(if (alreadyImported) "DÉJÀ IMPORTÉ" else "IMPORTÉ")
                                         }
+                                        Button(
+                                            onClick = {
+                                                // Construction flux JSON
+                                                val fluxJSON = JSONArray()
+                                                val lesEvaluations = bdd.toutesLesEvaluations()
+                                                lesEvaluations.forEach { e ->
+                                                    val obj = JSONObject()
+                                                    obj.put("code", e.code)
+                                                    obj.put("welcome", e.welcome)
+                                                    obj.put("shopPresentation", e.shopPresentation)
+                                                    obj.put("productQuality", e.productQuality)
+                                                    obj.put("bakery_id", e.bakery_id)
+                                                    fluxJSON.put(obj)
+                                                }
+                                                Log.i("Données envoyées", fluxJSON.toString())
 
+                                                // Configuration de la requête
+                                                val contentType = "application/json; charset=utf-8".toMediaTypeOrNull()
+                                                val requestBody = fluxJSON.toString().toRequestBody(contentType)
+                                                val clientHTTP = OkHttpClient()
+                                                val request = Request.Builder()
+                                                    .url("http://10.0.2.2:8000/api/evaluation")
+                                                    .post(requestBody)
+                                                    .build()
+
+                                                // Exécution de la requête en asynchrone
+                                                clientHTTP.newCall(request).enqueue(object : okhttp3.Callback {
+                                                    override fun onFailure(call: okhttp3.Call, e: IOException) {
+                                                        runOnUiThread {
+                                                            Toast.makeText(context, "ECHEC EXPORT ! " + e.message, Toast.LENGTH_SHORT).show()
+                                                        }
+                                                    }
+
+                                                    override fun onResponse(call: okhttp3.Call, response: Response) {
+                                                        if (response.isSuccessful) {
+                                                            Log.i("CodeHTTP", response.code.toString())
+                                                            Log.i("REPONSE", response.body!!.string())
+                                                            runOnUiThread {
+                                                                Toast.makeText(context, "EXPORT RÉUSSI !", Toast.LENGTH_SHORT).show()
+                                                            }
+                                                        } else {
+                                                            runOnUiThread {
+                                                                Toast.makeText(context, "ECHEC EXPORT !\n" + response.code.toString() + " " + response.message, Toast.LENGTH_SHORT).show()
+                                                            }
+                                                        }
+                                                    }
+                                                })
+                                            },
+                                            modifier = Modifier.padding(12.dp).width(120.dp)
+                                        ) {
+                                            Text("EXPORTER")
+                                        }
 
                                     }
                                 }
@@ -213,9 +265,9 @@ fun AccueilUI(modifier: Modifier = Modifier) {
 
                 if (bdd.nombreDeBakery() == 0) {
                     Toast.makeText(
-                        context,
-                        "Aucune boulangerie importée",
-                        Toast.LENGTH_SHORT
+                            context,
+                    "Aucune boulangerie importée",
+                    Toast.LENGTH_SHORT
                     ).show()
                 } else {
                     val intent = Intent(context, touteLesBakery::class.java)
