@@ -87,9 +87,9 @@ fun ClassementUI(modifier: Modifier = Modifier) {
     var showPopup by remember { mutableStateOf(false) }
     var evaluation by remember { mutableStateOf(Evaluation()) }
 
-    var welcome by remember { mutableFloatStateOf(0F) }
-    var shopPresentation by remember { mutableFloatStateOf(0F) }
-    var productQuality by remember { mutableFloatStateOf(0F) }
+    var welcome by remember { mutableFloatStateOf(3F) }
+    var shopPresentation by remember { mutableFloatStateOf(3F) }
+    var productQuality by remember { mutableFloatStateOf(3F) }
 
     Box(modifier = Modifier.fillMaxSize()) {
 
@@ -210,7 +210,7 @@ fun ClassementUI(modifier: Modifier = Modifier) {
                                 evaluation.shopPresentation = shopPresentation
                                 showPopup = false
                                 bdd.ajouterEvaluation(evaluation,evaluation.bakery_id)
-                                Toast.makeText(context, "ÉVALUATION REUSSI", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "ÉVALUATION RÉUSSIE", Toast.LENGTH_SHORT).show()
 
                             }
                         ) {

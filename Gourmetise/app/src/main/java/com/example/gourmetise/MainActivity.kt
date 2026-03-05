@@ -153,7 +153,7 @@ class MainActivity : ComponentActivity() {
                                                                 bdd.ajouterBakery(b)
                                                             }
                                                             alreadyImported=true
-                                                            runOnUiThread { Toast.makeText(context, "IMPORT REUSSI !",
+                                                            runOnUiThread { Toast.makeText(context, "IMPORT RÉUSSI !",
                                                                 Toast.LENGTH_SHORT).show()
                                                             }
                                                         } else {
@@ -164,7 +164,7 @@ class MainActivity : ComponentActivity() {
                                                                         "Hors période d’évaluation",
                                                                         Toast.LENGTH_LONG
                                                                     ).show()
-                                                                    Log.i("erreur", "403 - Hors période d’évaluation")
+                                                                    Log.i("erreur", "Hors période d’évaluation")
                                                                 }
                                                                 return
                                                             }
@@ -183,7 +183,7 @@ class MainActivity : ComponentActivity() {
                                                 .width(120.dp)
                                         )
                                         {
-                                            Text(if (alreadyImported) "DÉJÀ IMPORTÉ" else "IMPORTÉ")
+                                            Text(if (alreadyImported) "DÉJÀ IMPORTÉ" else "IMPORTER")
                                         }
                                         Button(
                                             onClick = {
@@ -225,7 +225,7 @@ class MainActivity : ComponentActivity() {
                                                             Log.i("REPONSE", response.body!!.string())
                                                             runOnUiThread {
                                                                 canExport=false
-                                                                Toast.makeText(context, "EXPORT RÉUSSI !", Toast.LENGTH_SHORT).show()
+                                                                Toast.makeText(context, "Exportation réussie !", Toast.LENGTH_SHORT).show()
                                                             }
                                                         } else {
                                                             runOnUiThread {
@@ -259,7 +259,6 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun AccueilUI(modifier: Modifier = Modifier) {
-    var nomProf by remember { mutableStateOf("") }
     val context = LocalContext.current
     Column(
         verticalArrangement = Arrangement.Center,
