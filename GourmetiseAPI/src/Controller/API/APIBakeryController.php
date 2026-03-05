@@ -19,12 +19,11 @@ use App\Repository\ContestParamsRepository;
 
 final class APIBakeryController extends AbstractController
 {
-    
+
     #[Route('/api/bakery', methods :["GET"])]
     public function getbakery(
         ContestParamsRepository $contestParamsRepository,
         BakeryRepository $repository
-        
         ) : JsonResponse
     {
         $bakery = $repository->findAll();
@@ -38,18 +37,18 @@ final class APIBakeryController extends AbstractController
     }
         return $this->json($bakery, Response::HTTP_OK, [], ['groups' => ['Bakery:Write']]);
     }
-    
+
     #[Route('/api/bakery', methods :["POST"])]
     public function createbakery(
-        Request $request, 
+        Request $request,
         EntityManagerInterface $entityManager,
         SerializerInterface $serializer,
         BakeryRepository $repository
     ) : JsonResponse
     {
         // récupérer le contenu JSON de la requête
-        $data = $request->getContent(); 
-        
+        $data = $request->getContent();
+
         try {
             // désérialiser le JSON en une instance de l'entité ContestParams
             $bakery = $serializer->deserialize($data, Bakery::class, 'json');
@@ -57,23 +56,23 @@ final class APIBakeryController extends AbstractController
             $email =$bakery->getBakeryUser()->getEmail();
             $user = $entityManager->getRepository(User::class)->findOneBy(['email' => $email]);
             $contestParams = $entityManager->getRepository(ContestParams::class)->find(1);
-            
+
             if($contestParams->getStatus()!==Status::REGISTRATION_OPEN){
                 return new JsonResponse(['message'=>'Status not correct'], Response::HTTP_BAD_REQUEST);
             }
             if($user ==null){
-                return new JsonResponse(['message'=>'email not exist'], Response::HTTP_BAD_REQUEST); 
+                return new JsonResponse(['message'=>'email not exist'], Response::HTTP_BAD_REQUEST);
             }
-            
+
             if ($user->getRole() !== 'ROLE_BAKER') {
                 return new JsonResponse(['message' => 'User is not a bakery'], Response::HTTP_BAD_REQUEST);
             }
-            
+
             $existeForUser=$repository->findOneBy(['bakeryUser' => $user]);
             if($existeForUser !== null){
                 return new JsonResponse(['message'=>'User has already a bakery'], Response::HTTP_BAD_REQUEST);
             }
-            
+
             $existingbakery = $repository->find($siret);
             if($existingbakery){
                 return new JsonResponse(['message'=>'Siret already exist'], Response::HTTP_BAD_REQUEST);
@@ -87,7 +86,7 @@ final class APIBakeryController extends AbstractController
 
             // envoyer réponse de succès de la création
             return new JsonResponse(['message'=>'Bakery created'], Response::HTTP_CREATED);
-        } 
+        }
         catch (\Exception $e) {
             return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
         }

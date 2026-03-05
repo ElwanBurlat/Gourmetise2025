@@ -1,7 +1,10 @@
 package com.example.gourmetise
 import GourmetiseDAO
-import android.R.attr.enabled
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -36,22 +39,27 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.gourmetise.ui.theme.GourmetiseTheme
-import com.example.gourmetise.ui.theme.PurpleGrey40
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.Color
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
+import org.json.JSONObject
+import java.io.IOException
 
 
 class touteLesBakery : ComponentActivity() {
@@ -79,13 +87,11 @@ fun ClassementUI(modifier: Modifier = Modifier) {
     var showPopup by remember { mutableStateOf(false) }
     var evaluation by remember { mutableStateOf(Evaluation()) }
 
+    var welcome by remember { mutableFloatStateOf(3F) }
+    var shopPresentation by remember { mutableFloatStateOf(3F) }
+    var productQuality by remember { mutableFloatStateOf(3F) }
 
-    var welcome by remember { mutableFloatStateOf(0F) }
-    var shopPresentation by remember { mutableFloatStateOf(0F) }
-    var productQuality by remember { mutableFloatStateOf(0F) }
-    var codeTicket by remember {mutableStateOf("")}
     Box(modifier = Modifier.fillMaxSize()) {
-
 
         Column(
             verticalArrangement = Arrangement.Top,
@@ -109,17 +115,15 @@ fun ClassementUI(modifier: Modifier = Modifier) {
                 lesBakery.forEach { bakery ->
                     BakeryCard(
                         bakery = bakery,
-                        onShowPopup = { codeSaisi ->
+                        onShowPopup = { codeSaisi, bakerySiret ->
                             evaluation.code = codeSaisi
-
-
+                            evaluation.bakery_id = bakerySiret
                             showPopup = true
                         }
                     )
                 }
             }
         }
-
 
         if (showPopup) {
             Box(
@@ -151,9 +155,7 @@ fun ClassementUI(modifier: Modifier = Modifier) {
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             for (i in 1..5) {
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     RadioButton(
                                         selected = welcome == i.toFloat(),
                                         onClick = { welcome = i.toFloat() }
@@ -203,12 +205,13 @@ fun ClassementUI(modifier: Modifier = Modifier) {
 
                         Button(
                             onClick = {
-                                evaluation.welcome=welcome;
-                                evaluation.productQuality=productQuality;
-                                evaluation.shopPresentation=shopPresentation;
+                                evaluation.welcome = welcome
+                                evaluation.productQuality = productQuality
+                                evaluation.shopPresentation = shopPresentation
                                 showPopup = false
+                                bdd.ajouterEvaluation(evaluation,evaluation.bakery_id)
+                                Toast.makeText(context, "ÉVALUATION RÉUSSIE", Toast.LENGTH_SHORT).show()
 
-                                bdd.ajouterEvaluation(evaluation)
                             }
                         ) {
                             Text("Valider")
@@ -221,9 +224,11 @@ fun ClassementUI(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun BakeryCard(bakery: Bakery, onShowPopup: (String) -> Unit) {
+fun BakeryCard(bakery: Bakery, onShowPopup: (String, String) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
     var code by remember { mutableStateOf("") }
+    val context = LocalContext.current
+    val bdd = GourmetiseDAO(context = context)
 
     Card(
         modifier = Modifier
@@ -235,8 +240,6 @@ fun BakeryCard(bakery: Bakery, onShowPopup: (String) -> Unit) {
 
         Column(modifier = Modifier.padding(16.dp)) {
 
-
-            // NOM DE LA BAKERY
             Text(
                 text = bakery.companyName,
                 fontSize = 22.sp,
@@ -245,83 +248,42 @@ fun BakeryCard(bakery: Bakery, onShowPopup: (String) -> Unit) {
             )
 
             Spacer(modifier = Modifier.height(8.dp))
-
             Spacer(modifier = Modifier.height(12.dp))
 
-            // ADRESSE
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    Icons.Default.LocationOn,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.tertiary
-                )
-                Text(
-                    text = "${bakery.adress}, ${bakery.postalcode}",
-                    modifier = Modifier.padding(start = 6.dp),
-                    fontSize = 16.sp
-                )
+                Icon(Icons.Default.LocationOn, contentDescription = null, tint = MaterialTheme.colorScheme.tertiary)
+                Text(text = "${bakery.adress}, ${bakery.postalcode}", modifier = Modifier.padding(start = 6.dp), fontSize = 16.sp)
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // PHONE BAKERY
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    Icons.Default.Phone,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.tertiary
-                )
-                Text(
-                    text = bakery.phone,
-                    modifier = Modifier.padding(start = 6.dp),
-                    fontSize = 16.sp
-                )
+                Icon(Icons.Default.Phone, contentDescription = null, tint = MaterialTheme.colorScheme.tertiary)
+                Text(text = bakery.phone, modifier = Modifier.padding(start = 6.dp), fontSize = 16.sp)
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // CONTACT
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    Icons.Default.Person,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.tertiary
-                )
-                Text(
-                    text = "${bakery.nameContact} — ${bakery.phoneContact}",
-                    modifier = Modifier.padding(start = 6.dp),
-                    fontSize = 16.sp
-                )
+                Icon(Icons.Default.Person, contentDescription = null, tint = MaterialTheme.colorScheme.tertiary)
+                Text(text = "${bakery.nameContact} — ${bakery.phoneContact}", modifier = Modifier.padding(start = 6.dp), fontSize = 16.sp)
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // DESCRIPTION
-            Text(
-                text = bakery.description,
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.outline
-            )
-
-
-
+            Text(text = bakery.description, fontSize = 14.sp, color = MaterialTheme.colorScheme.outline)
 
             IconButton(
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally),
+                modifier = Modifier.align(Alignment.CenterHorizontally),
                 onClick = { expanded = !expanded }
             ) {
                 Icon(
-                    imageVector = if (expanded)
-                        Icons.Default.KeyboardArrowUp
-                    else
-                        Icons.Default.KeyboardArrowDown,
+                    imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                     contentDescription = null
                 )
             }
 
             AnimatedVisibility(visible = expanded) {
-
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -339,26 +301,28 @@ fun BakeryCard(bakery: Bakery, onShowPopup: (String) -> Unit) {
 
                     Button(
                         onClick = {
-                            onShowPopup(code)
-                        },
+                           val codeExiste = bdd.verifierCode(code)
+                            val evaluationExiste=bdd.verifierVote(bakery.siret)
+                            if (evaluationExiste)
+                            {
+                                Toast.makeText(context, "Vous avez déjà évalué cette boulangerie !", Toast.LENGTH_SHORT).show()
+                            }
+                            else if (!codeExiste)
+                            {
+                                onShowPopup(code, bakery.siret)                            }
+                            else
+                            {
+                                Toast.makeText(context, "Code déja utilisé", Toast.LENGTH_SHORT).show()
+                            } },
                         enabled = code.isNotBlank()
                     ) {
                         Text("Entrer le code")
                     }
                 }
             }
-
-        }
-
-
-
-
         }
     }
-
-
-
-
+}
 
 
 @Preview(showBackground = true)
@@ -376,10 +340,7 @@ fun BakeryCardPreview() {
         bakery.description = "Boulangerie artisanale"
         BakeryCard(
             bakery = bakery,
-            onShowPopup = { }
+            onShowPopup = { _, _ -> }
         )
-
-
     }
 }
-

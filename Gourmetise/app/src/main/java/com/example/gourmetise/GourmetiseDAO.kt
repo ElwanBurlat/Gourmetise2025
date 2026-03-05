@@ -13,10 +13,11 @@ class GourmetiseDAO (context : Context) {
         monHelper = GourmetiseHelper(context);
         maBase = monHelper.writableDatabase;
     }
-    fun ajouterEvaluation(uneEvaluation:Evaluation){
+    fun ajouterEvaluation(uneEvaluation:Evaluation,siret:String){
         val e = ContentValues()
 
         e.put("code", uneEvaluation.code)
+        e.put("siret",siret)
         e.put("welcome", uneEvaluation.welcome)
         e.put("shopPresentation", uneEvaluation.shopPresentation)
         e.put("productQuality", uneEvaluation.productQuality)
@@ -24,12 +25,54 @@ class GourmetiseDAO (context : Context) {
         maBase.insert("Evaluation", null, e)
 
     }
+    fun nombreDEvaluations(): Int {
+        val cursor = maBase.rawQuery("SELECT COUNT(*) FROM EVALUATION", null)
+        cursor.moveToFirst()
+        val count = cursor.getInt(0)
+        cursor.close()
+        return count
+    }
+
+
+    fun verifierCode(code:String): Boolean{
+        val cursor = maBase.rawQuery("SELECT 1 FROM Evaluation WHERE code= ?",arrayOf(code))
+        val existe = cursor.moveToFirst()
+        return existe
+    }
+
+    fun verifierVote(siret: String): Boolean{
+        val cursor =maBase.rawQuery("SELECT 1 FROM Evaluation WHERE siret=?",arrayOf(siret))
+        val existe = cursor.moveToFirst()
+        return existe
+    }
+    fun verifierImport(): Boolean {
+        val cursor = maBase.rawQuery("SELECT 1 FROM BAKERY", null)
+        val existe = cursor.moveToFirst()
+        cursor.close()
+        return existe
+    }
+
+    fun toutesLesEvaluations(): List<Evaluation> {
+        val liste = mutableListOf<Evaluation>()
+        val cursor = maBase.rawQuery("SELECT * FROM Evaluation", null)
+        while (cursor.moveToNext()) {
+            val e = Evaluation()
+            e.code = cursor.getString(cursor.getColumnIndexOrThrow("code"))
+            e.welcome = cursor.getFloat(cursor.getColumnIndexOrThrow("welcome"))
+            e.shopPresentation = cursor.getFloat(cursor.getColumnIndexOrThrow("shopPresentation"))
+            e.productQuality = cursor.getFloat(cursor.getColumnIndexOrThrow("productQuality"))
+            e.bakery_id = cursor.getString(cursor.getColumnIndexOrThrow("siret"))
+            liste.add(e)
+        }
+        cursor.close()
+        return liste
+    }
     fun supprimerToutesLesBakery() {
         maBase.delete("Bakery", null, null)
     }
 
     fun nombreDeBakery(): Int {
-        val cursor = maBase.rawQuery("SELECT COUNT(*) FROM Bakery", null)
+        val cursor = maBase.rawQuery("SELECT COUNT(*) FROM Bakery",null )
         cursor.moveToFirst()
         val count = cursor.getInt(0)
         cursor.close()
@@ -59,7 +102,6 @@ class GourmetiseDAO (context : Context) {
 
         val lesBakery = mutableListOf<Bakery>()
 
-        // On sélectionne seulement les colonnes qu'on veut
         val curseur = maBase.rawQuery(
             "SELECT siret, companyName, phone, adress, postalcode, nameContact, phoneContact, description FROM Bakery",
             arrayOf()

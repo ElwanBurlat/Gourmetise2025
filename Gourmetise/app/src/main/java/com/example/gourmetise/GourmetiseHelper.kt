@@ -2,7 +2,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 class GourmetiseHelper (context : Context)
-    : SQLiteOpenHelper (context, "baseGourmetise.db", null, 3){
+    : SQLiteOpenHelper (context, "baseGourmetise.db", null, 4){
     override fun onCreate(db: SQLiteDatabase) {
         // création des tables de la base embarquée
         // création de la table CONCURRENT
@@ -18,6 +18,7 @@ class GourmetiseHelper (context : Context)
 
         db.execSQL("CREATE TABLE Evaluation ("
                 + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + "siret TEXT NOT NULL,"
                 + "code TEXT NOT NULL ,"
                 + "welcome REAL NOT NULL,"
                 + "shopPresentation REAL NOT NULL,"
