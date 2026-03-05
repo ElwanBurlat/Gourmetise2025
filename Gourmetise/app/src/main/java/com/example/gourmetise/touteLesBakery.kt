@@ -210,6 +210,8 @@ fun ClassementUI(modifier: Modifier = Modifier) {
                                 evaluation.shopPresentation = shopPresentation
                                 showPopup = false
                                 bdd.ajouterEvaluation(evaluation,evaluation.bakery_id)
+                                Toast.makeText(context, "ÉVALUATION REUSSI", Toast.LENGTH_SHORT).show()
+
                             }
                         ) {
                             Text("Valider")
