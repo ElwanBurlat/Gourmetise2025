@@ -53,6 +53,7 @@ import com.example.gourmetise.ui.theme.GourmetiseTheme
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.setValue
+import androidx.room.util.copy
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -90,6 +91,8 @@ fun ClassementUI(modifier: Modifier = Modifier) {
     var welcome by remember { mutableFloatStateOf(3F) }
     var shopPresentation by remember { mutableFloatStateOf(3F) }
     var productQuality by remember { mutableFloatStateOf(3F) }
+
+    var notesParBakery by remember { mutableStateOf<Map<String, Evaluation>>(emptyMap()) }
 
     Box(modifier = Modifier.fillMaxSize()) {
 
