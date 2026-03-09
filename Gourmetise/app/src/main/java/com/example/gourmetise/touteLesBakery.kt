@@ -53,6 +53,7 @@ import com.example.gourmetise.ui.theme.GourmetiseTheme
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.setValue
+import androidx.room.util.copy
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -87,9 +88,11 @@ fun ClassementUI(modifier: Modifier = Modifier) {
     var showPopup by remember { mutableStateOf(false) }
     var evaluation by remember { mutableStateOf(Evaluation()) }
 
-    var welcome by remember { mutableFloatStateOf(0F) }
-    var shopPresentation by remember { mutableFloatStateOf(0F) }
-    var productQuality by remember { mutableFloatStateOf(0F) }
+    var welcome by remember { mutableFloatStateOf(3F) }
+    var shopPresentation by remember { mutableFloatStateOf(3F) }
+    var productQuality by remember { mutableFloatStateOf(3F) }
+
+    var notesParBakery by remember { mutableStateOf<Map<String, Evaluation>>(emptyMap()) }
 
     Box(modifier = Modifier.fillMaxSize()) {
 
@@ -210,6 +213,8 @@ fun ClassementUI(modifier: Modifier = Modifier) {
                                 evaluation.shopPresentation = shopPresentation
                                 showPopup = false
                                 bdd.ajouterEvaluation(evaluation,evaluation.bakery_id)
+                                Toast.makeText(context, "ÉVALUATION RÉUSSIE", Toast.LENGTH_SHORT).show()
+
                             }
                         ) {
                             Text("Valider")

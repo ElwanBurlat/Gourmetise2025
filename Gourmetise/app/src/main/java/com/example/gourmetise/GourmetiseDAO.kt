@@ -25,6 +25,14 @@ class GourmetiseDAO (context : Context) {
         maBase.insert("Evaluation", null, e)
 
     }
+    fun nombreDEvaluations(): Int {
+        val cursor = maBase.rawQuery("SELECT COUNT(*) FROM EVALUATION", null)
+        cursor.moveToFirst()
+        val count = cursor.getInt(0)
+        cursor.close()
+        return count
+    }
+
 
     fun verifierCode(code:String): Boolean{
         val cursor = maBase.rawQuery("SELECT 1 FROM Evaluation WHERE code= ?",arrayOf(code))
@@ -35,6 +43,12 @@ class GourmetiseDAO (context : Context) {
     fun verifierVote(siret: String): Boolean{
         val cursor =maBase.rawQuery("SELECT 1 FROM Evaluation WHERE siret=?",arrayOf(siret))
         val existe = cursor.moveToFirst()
+        return existe
+    }
+    fun verifierImport(): Boolean {
+        val cursor = maBase.rawQuery("SELECT 1 FROM BAKERY", null)
+        val existe = cursor.moveToFirst()
+        cursor.close()
         return existe
     }
 
@@ -53,15 +67,6 @@ class GourmetiseDAO (context : Context) {
         cursor.close()
         return liste
     }
-
-    fun nombreDeEvaluation(): Int {
-        val cursor = maBase.rawQuery("SELECT COUNT(*) FROM Evaluation",null )
-        cursor.moveToFirst()
-        val count = cursor.getInt(0)
-        cursor.close()
-        return count
-    }
-
     fun supprimerToutesLesBakery() {
         maBase.delete("Bakery", null, null)
     }

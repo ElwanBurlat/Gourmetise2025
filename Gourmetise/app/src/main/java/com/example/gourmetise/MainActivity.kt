@@ -52,11 +52,15 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.traceEventStart
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import okhttp3.MediaType.Companion.toMediaType
 import kotlin.jvm.java
 
@@ -70,9 +74,19 @@ class MainActivity : ComponentActivity() {
             GourmetiseTheme {
                 val context = LocalContext.current
                 var bdd = GourmetiseDAO(context = context);
-                val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-                var alreadyImported by remember {
-                    mutableStateOf(prefs.getBoolean("import_done", false))
+                var alreadyImported by remember {mutableStateOf(bdd.verifierImport()) }
+                var canExport by remember { mutableStateOf(bdd.nombreDEvaluations() >= 5) }
+                val lifecycleOwner = LocalLifecycleOwner.current
+
+                DisposableEffect(lifecycleOwner) {
+                    val observer = LifecycleEventObserver { _, event ->
+                        if (event == Lifecycle.Event.ON_RESUME) {
+                            canExport =
+                                bdd.nombreDEvaluations() >= 5
+                        }
+                    }
+                    lifecycleOwner.lifecycle.addObserver(observer)
+                    onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
                 }
 
 
@@ -138,9 +152,8 @@ class MainActivity : ComponentActivity() {
                                                                 b.description = jsonObject.getString("description")
                                                                 bdd.ajouterBakery(b)
                                                             }
-                                                            prefs.edit().putBoolean("import_done", true).apply()
                                                             alreadyImported=true
-                                                            runOnUiThread { Toast.makeText(context, "IMPORT REUSSI !",
+                                                            runOnUiThread { Toast.makeText(context, "IMPORT RÉUSSI !",
                                                                 Toast.LENGTH_SHORT).show()
                                                             }
                                                         } else {
@@ -151,7 +164,7 @@ class MainActivity : ComponentActivity() {
                                                                         "Hors période d’évaluation",
                                                                         Toast.LENGTH_LONG
                                                                     ).show()
-                                                                    Log.i("erreur", "403 - Hors période d’évaluation")
+                                                                    Log.i("erreur", "Hors période d’évaluation")
                                                                 }
                                                                 return
                                                             }
@@ -164,16 +177,17 @@ class MainActivity : ComponentActivity() {
                                                         }
                                                     }
                                                 }) },
-
+                                                    enabled =!alreadyImported ,
                                             modifier = Modifier
                                                 .padding(12.dp)
                                                 .width(120.dp)
                                         )
                                         {
-                                            Text(if (alreadyImported) "DÉJÀ IMPORTÉ" else "IMPORTÉ")
+                                            Text(if (alreadyImported) "DÉJÀ IMPORTÉ" else "IMPORTER")
                                         }
                                         Button(
                                             onClick = {
+
                                                 // Construction flux JSON
                                                 val fluxJSON = JSONArray()
                                                 val lesEvaluations = bdd.toutesLesEvaluations()
@@ -210,7 +224,8 @@ class MainActivity : ComponentActivity() {
                                                             Log.i("CodeHTTP", response.code.toString())
                                                             Log.i("REPONSE", response.body!!.string())
                                                             runOnUiThread {
-                                                                Toast.makeText(context, "EXPORT RÉUSSI !", Toast.LENGTH_SHORT).show()
+                                                                canExport=false
+                                                                Toast.makeText(context, "Exportation réussie !", Toast.LENGTH_SHORT).show()
                                                             }
                                                         } else {
                                                             runOnUiThread {
@@ -220,6 +235,7 @@ class MainActivity : ComponentActivity() {
                                                     }
                                                 })
                                             },
+                                            enabled = canExport,
                                             modifier = Modifier.padding(12.dp).width(120.dp)
                                         ) {
                                             Text("EXPORTER")
@@ -243,7 +259,6 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun AccueilUI(modifier: Modifier = Modifier) {
-    var nomProf by remember { mutableStateOf("") }
     val context = LocalContext.current
     Column(
         verticalArrangement = Arrangement.Center,
