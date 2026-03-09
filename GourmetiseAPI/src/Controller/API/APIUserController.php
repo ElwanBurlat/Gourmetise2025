@@ -55,4 +55,11 @@ final class APIUserController extends AbstractController
             return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
         }
     }
+    #[Route('/api/profile', name: 'profile', methods: ['GET'])]
+    public function getProfile(): JsonResponse
+    {
+        // Récupérer l'utilisateur connecté
+        $user = $this->getUser();
+        return $this->json($user, status: Response::HTTP_OK);
+    }
 }
