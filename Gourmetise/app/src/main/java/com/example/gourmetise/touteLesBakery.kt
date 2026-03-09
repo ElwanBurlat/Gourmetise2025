@@ -53,15 +53,6 @@ import com.example.gourmetise.ui.theme.GourmetiseTheme
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.setValue
-import androidx.room.util.copy
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.Response
-import org.json.JSONObject
-import java.io.IOException
-
 
 class touteLesBakery : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -92,7 +83,6 @@ fun ClassementUI(modifier: Modifier = Modifier) {
     var shopPresentation by remember { mutableFloatStateOf(3F) }
     var productQuality by remember { mutableFloatStateOf(3F) }
 
-    var notesParBakery by remember { mutableStateOf<Map<String, Evaluation>>(emptyMap()) }
 
     Box(modifier = Modifier.fillMaxSize()) {
 
@@ -212,6 +202,7 @@ fun ClassementUI(modifier: Modifier = Modifier) {
                                 evaluation.productQuality = productQuality
                                 evaluation.shopPresentation = shopPresentation
                                 showPopup = false
+
                                 bdd.ajouterEvaluation(evaluation,evaluation.bakery_id)
                                 Toast.makeText(context, "ÉVALUATION RÉUSSIE", Toast.LENGTH_SHORT).show()
 
@@ -227,12 +218,16 @@ fun ClassementUI(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun BakeryCard(bakery: Bakery, onShowPopup: (String, String) -> Unit) {
+fun BakeryCard(bakery: Bakery, onShowPopup: (String, String) -> Unit, ) {
     var expanded by remember { mutableStateOf(false) }
     var code by remember { mutableStateOf("") }
     val context = LocalContext.current
     val bdd = GourmetiseDAO(context = context)
+    val evaluationExiste = bdd.verifierVote(bakery.siret)
 
+    if (evaluationExiste && expanded) {
+        expanded = false
+    }
     Card(
         modifier = Modifier
             .padding(12.dp)
@@ -278,7 +273,8 @@ fun BakeryCard(bakery: Bakery, onShowPopup: (String, String) -> Unit) {
 
             IconButton(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                onClick = { expanded = !expanded }
+                onClick = { expanded = !expanded },
+                enabled = !evaluationExiste
             ) {
                 Icon(
                     imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
