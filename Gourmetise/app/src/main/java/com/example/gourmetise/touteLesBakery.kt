@@ -178,7 +178,7 @@ fun ClassementUI(modifier: Modifier = Modifier) {
 
                         Spacer(modifier = Modifier.height(8.dp))
 
-                        Text("Qualité des produits")
+                        Text("Qualités des produits")
                         Row(
                             horizontalArrangement = Arrangement.SpaceEvenly,
                             modifier = Modifier.fillMaxWidth()
@@ -280,6 +280,12 @@ fun BakeryCard(bakery: Bakery, onShowPopup: (String, String) -> Unit, ) {
                     imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                     contentDescription = null
                 )
+            }
+            if(evaluationExiste){
+                val evaluation = bdd.getEvaluation(bakery.siret)
+                Text(text = "Accueil : ${evaluation?.welcome}",)
+                Text(text = "Presentation du magasin : ${evaluation?.shopPresentation}")
+                Text(text = "Qualités des produits  : ${evaluation?.productQuality}",)
             }
 
             AnimatedVisibility(visible = expanded) {
