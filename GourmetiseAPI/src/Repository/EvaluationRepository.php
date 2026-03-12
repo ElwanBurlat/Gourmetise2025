@@ -16,6 +16,25 @@ class EvaluationRepository extends ServiceEntityRepository
         parent::__construct($registry, Evaluation::class);
     }
 
+    public function findScore():array
+    {
+        $qb = $this->createQueryBuilder('e');
+
+        $qb->select(
+            'SUM(e.welcome) / COUNT(e.id) AS note_w',
+            'SUM(e.shopPresentation) / COUNT(e.id) AS note_s',
+            'SUM(e.productQuality) / COUNT(e.id) AS note_p',
+            '(SUM(e.welcome) + SUM(e.shopPresentation) + SUM(e.productQuality)) / (COUNT(e.id) * 3) AS moyenne'
+        )
+            ->groupBy('e.bakery_id')
+            ->orderBy('moyenne', 'DESC')
+            ->addOrderBy('SUM(e.productQuality)', 'DESC')
+            ->addOrderBy('SUM(e.welcome)', 'DESC')
+            ->addOrderBy('SUM(e.shopPresentation)', 'DESC');
+
+        return  $qb->getQuery()->getResult();
+    }
+
     //    /**
     //     * @return Evaluation[] Returns an array of Evaluation objects
     //     */
