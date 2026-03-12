@@ -58,7 +58,7 @@ class APIEvaluationController extends AbstractController
         EvaluationRepository $repository
         ) : JsonResponse
     {
-        $evaluation = $repository->findAll();
+        $evaluation = $repository->findScore();
         $contestParams = $contestParamsRepository->find(1);
 
         if ($contestParams->getStatus() !== Status::FINISHED) {
