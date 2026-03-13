@@ -9,18 +9,27 @@
   "scripts": {
     "dev": "vite --port 3006 --host",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check"
   },
   "dependencies": {
+    "@mdi/font": "7.4.47",
+    "axios": "^1.7.7",
     "pinia": "^3.0.3",
     "vue": "^3.5.22",
     "vue-router": "^4.6.3",
-    "axios": "^1.7.7",
-    "@mdi/font": "7.4.47",
     "vuetify": "^3.7.4"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@vitejs/plugin-vue": "^6.0.1",
+    "eslint": "^10.0.3",
+    "eslint-plugin-vue": "^10.8.0",
+    "globals": "^17.4.0",
+    "prettier": "^3.8.1",
     "vite": "^7.1.11",
     "vite-plugin-vue-devtools": "^8.0.3"
   }
