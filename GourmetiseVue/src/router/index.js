@@ -2,6 +2,7 @@ import {createRouter, createWebHistory} from 'vue-router'
 import Index from "@/views/index.vue";
 import ContestParams from '@/views/ContestParam.vue';
 import signIn from '@/views/sign-in.vue';
+import results from '@/views/results.vue';
 import CreateConcours from '@/views/ContestParam/CreateConcours.vue';
 import SeeConcours from '@/views/ContestParam/SeeConcours.vue';
 
@@ -22,6 +23,11 @@ const router = createRouter({
             path: '/sign-in',
             name: 'sign-in',
             component: signIn,
+        },
+        {
+            path: '/results',
+            name: 'results',
+            component: results,
         },
         {
             path: '/CreateConcours',
