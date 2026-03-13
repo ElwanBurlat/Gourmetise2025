@@ -1,4 +1,5 @@
 <template>
+<<<<<<< HEAD
   <div class="resultats-container">
     <h1 class="titre">Résultat du concours</h1>
 
@@ -96,3 +97,18 @@ const moyenne = ref('')
 }
 
 </style>
+=======
+  <button>
+    SELECT SUM(welcome)/COUNT(bakery_id) AS note_w,
+    SUM(shop_presentation)/COUNT(bakery_id) AS note_s,
+    SUM(product_quality)/COUNT(bakery_id) AS note_p,
+    ROUND((SUM(welcome)+SUM(shop_presentation)+SUM(product_quality))/(COUNT(bakery_id)*3),2) AS moyenne
+    FROM evaluation
+    GROUP BY bakery_id
+    ORDER BY moyenne DESC,
+    SUM(product_quality) DESC,
+    SUM(welcome) DESC,
+    SUM(shop_presentation) DESC;
+  </button>
+</template>
+>>>>>>> e7bd7bcaef4d3a1311a2676b1c66ac3b223565d1
