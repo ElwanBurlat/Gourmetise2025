@@ -12,8 +12,8 @@ class Evaluation
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
-    
-    
+
+
     #[ORM\Column(length: 6)]
     private ?string $code = null;
 
@@ -26,8 +26,9 @@ class Evaluation
     #[ORM\Column]
     private ?float $productQuality = null;
 
-    #[ORM\Column(length: 15)]
-    private ?string $bakery_id = null;
+    #[ORM\ManyToOne(targetEntity: Bakery::class)]
+    #[ORM\JoinColumn(name: 'bakery_user_id', referencedColumnName: 'siret', nullable: false)]
+    private ?Bakery $bakery = null;
 
     public function getId(): ?int
     {
@@ -82,14 +83,14 @@ class Evaluation
         return $this;
     }
 
-    public function getBakeryId(): ?string
+    public function getBakeryId(): ?Bakery
     {
-        return $this->bakery_id;
+        return $this->bakery;
     }
 
-    public function setBakeryId(string $bakery_id): static
+    public function setBakeryId(Bakery $bakery): static
     {
-        $this->bakery_id = $bakery_id;
+        $this->bakery = $bakery;
 
         return $this;
     }

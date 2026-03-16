@@ -16,23 +16,26 @@ class EvaluationRepository extends ServiceEntityRepository
         parent::__construct($registry, Evaluation::class);
     }
 
-    public function findScore():array
+    public function findScore(): array
     {
-        $qb = $this->createQueryBuilder('e');
-
-        $qb->select(
-            'SUM(e.welcome) / COUNT(e.id) AS note_w',
-            'SUM(e.shopPresentation) / COUNT(e.id) AS note_s',
-            'SUM(e.productQuality) / COUNT(e.id) AS note_p',
-            '(SUM(e.welcome) + SUM(e.shopPresentation) + SUM(e.productQuality)) / (COUNT(e.id) * 3) AS moyenne'
-        )
-            ->groupBy('e.bakery_id')
+        return $this->createQueryBuilder('e')
+            ->join('e.bakery', 'b')
+            ->select(
+                'b.siret AS bakery_siret',
+                'b.companyName AS company_name',
+                'SUM(e.welcome) / COUNT(e.id) AS note_w',
+                'SUM(e.shopPresentation) / COUNT(e.id) AS note_s',
+                'SUM(e.productQuality) / COUNT(e.id) AS note_p',
+                '(SUM(e.welcome) + SUM(e.shopPresentation) + SUM(e.productQuality)) / (COUNT(e.id) * 3) AS moyenne'
+            )
+            ->groupBy('b.siret')
+            ->addGroupBy('b.companyName')
             ->orderBy('moyenne', 'DESC')
-            ->addOrderBy('SUM(e.productQuality)', 'DESC')
-            ->addOrderBy('SUM(e.welcome)', 'DESC')
-            ->addOrderBy('SUM(e.shopPresentation)', 'DESC');
-
-        return  $qb->getQuery()->getResult();
+            ->addOrderBy('note_p', 'DESC')
+            ->addOrderBy('note_w', 'DESC')
+            ->addOrderBy('note_s', 'DESC')
+            ->getQuery()
+            ->getArrayResult();
     }
 
     //    /**
