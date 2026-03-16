@@ -16,8 +16,10 @@ use Symfony\Component\Serializer\SerializerInterface;
 use App\Entity\User;
 use App\Enum\Status;
 use App\Repository\ContestParamsRepository;
+use App\Repository\EvaluationRepository;
 
-class APIEvaluationController
+
+class APIEvaluationController extends AbstractController
 {
     #[Route('/api/evaluation', methods: ["POST"])]
     public function exportEvaluation(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
@@ -48,6 +50,24 @@ class APIEvaluationController
         } catch (\Exception $e) {
             return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
         }
+    }
+
+    #[Route('/api/evaluation', methods :["GET"])]
+    public function getevaluation(
+        ContestParamsRepository $contestParamsRepository,
+        EvaluationRepository $repository
+        ) : JsonResponse
+    {
+        $evaluation = $repository->findScore();
+        $contestParams = $contestParamsRepository->find(1);
+
+        if ($contestParams->getStatus() !== Status::FINISHED) {
+        return new JsonResponse(
+            ['message' => 'Status not correct'],
+            Response::HTTP_BAD_REQUEST
+        );
+    }
+        return $this->json($evaluation, Response::HTTP_OK, []);
     }
 
 
