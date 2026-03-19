@@ -19,9 +19,22 @@ use App\Repository\ContestParamsRepository;
 use App\Repository\EvaluationRepository;
 
 
+use OpenApi\Attributes as OA;
+#[OA\Tag(name: "Evaluations")]
 class APIEvaluationController extends AbstractController
 {
     #[Route('/api/evaluation', methods: ["POST"])]
+    #[OA\Post(
+        path: "/api/evaluation",
+        summary: "Créer des évaluations",
+        tags: ["Evaluations"],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Evaluations crées"
+            )
+        ]
+    )]
     public function exportEvaluation(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -53,6 +66,17 @@ class APIEvaluationController extends AbstractController
     }
 
     #[Route('/api/evaluation', methods :["GET"])]
+    #[OA\Get(
+        path: "/api/evaluation",
+        summary: "Données des évaluations",
+        tags: ["Evaluations"],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Evaluations crées"
+            )
+        ]
+    )]
     public function getevaluation(
         ContestParamsRepository $contestParamsRepository,
         EvaluationRepository $repository
