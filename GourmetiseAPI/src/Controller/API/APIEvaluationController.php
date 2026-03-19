@@ -31,28 +31,55 @@ class APIEvaluationController extends AbstractController
         responses: [
             new OA\Response(
                 response: 200,
-                description: "Evaluations crées"
+                description: "Evaluations créées"
             )
         ]
     )]
-    public function exportEvaluation(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
+    public function exportEvaluation(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        SerializerInterface $serializer,
+        BakeryRepository $bakeryRepository
+    ): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
         try {
             $contestParams = $entityManager->getRepository(ContestParams::class)->find(1);
 
+            if (!$contestParams) {
+                return new JsonResponse(['message' => 'Contest params not found'], Response::HTTP_NOT_FOUND);
+            }
+
             if ($contestParams->getStatus() !== Status::EVALUATION_OPEN) {
                 return new JsonResponse(['message' => 'Status not correct'], Response::HTTP_BAD_REQUEST);
             }
 
-            if (isset($data[0])) {
-                foreach ($data as $item) {
-                    $evaluation = $serializer->deserialize(json_encode($item), Evaluation::class, 'json');
-                    $entityManager->persist($evaluation);
+            $items = isset($data[0]) ? $data : [$data];
+
+            foreach ($items as $item) {
+                $bakerySiret = $item['bakery'] ?? null;
+
+                if (!$bakerySiret) {
+                    return new JsonResponse(['error' => 'Bakery siret is missing'], Response::HTTP_BAD_REQUEST);
                 }
-            } else {
-                $evaluation = $serializer->deserialize($request->getContent(), Evaluation::class, 'json');
+
+                $bakery = $bakeryRepository->find($bakerySiret);
+
+                if (!$bakery) {
+                    return new JsonResponse(['error' => 'Bakery not found'], Response::HTTP_BAD_REQUEST);
+                }
+
+                unset($item['bakery']);
+
+                $evaluation = $serializer->deserialize(
+                    json_encode($item),
+                    Evaluation::class,
+                    'json'
+                );
+
+                $evaluation->setBakery($bakery);
+
                 $entityManager->persist($evaluation);
             }
 

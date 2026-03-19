@@ -27,7 +27,7 @@ class Evaluation
     private ?float $productQuality = null;
 
     #[ORM\ManyToOne(targetEntity: Bakery::class)]
-    #[ORM\JoinColumn(name: 'bakery_user_id', referencedColumnName: 'siret', nullable: false)]
+    #[ORM\JoinColumn(name: 'siret', referencedColumnName: 'siret', nullable: false)]
     private ?Bakery $bakery = null;
 
     public function getId(): ?int
@@ -83,12 +83,12 @@ class Evaluation
         return $this;
     }
 
-    public function getBakeryId(): ?Bakery
+    public function getBakery(): ?Bakery
     {
         return $this->bakery;
     }
 
-    public function setBakeryId(Bakery $bakery): static
+    public function setBakery(Bakery $bakery): static
     {
         $this->bakery = $bakery;
 
