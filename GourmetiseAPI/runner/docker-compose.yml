@@ -1,0 +1,17 @@
+services:
+  worker:
+    image: myoung34/github-runner:debian-sid
+    container_name: runner-scrolly
+    restart: always
+    environment:
+      REPO_URL: https://github.com/ElwanBurlat/Gourmetise2025.git
+      RUNNER_NAME: Gourmetise
+      RUNNER_TOKEN: BOWUTNVVMVPWEMLT5BG5SGLJXUK7U
+      RUNNER_WORKDIR: /tmp/runner/work
+      RUNNER_SCOPE: 'repo'
+      LABELS: linux,x64,gpu
+    security_opt:
+      - label:disable
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock'
+      - '/tmp/runner/:/tmp/runner/'
