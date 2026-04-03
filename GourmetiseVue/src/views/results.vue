@@ -24,9 +24,9 @@
       </tbody>
     </table>
   </div>
-  <v-btn class="" color="primary" @click="fetchGet"
-    >Generation résultats !</v-btn
-  >
+  <v-btn class="" color="primary" @click="fetchGet">
+    Generation résultats !
+  </v-btn>
 </template>
 
 <script setup>
