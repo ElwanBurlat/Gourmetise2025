@@ -1,0 +1,48 @@
+name: Front Vue CI/CD (Gourmetise)
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'GourmetiseVue/**'
+  workflow_dispatch:
+
+env:
+  PORT: 80
+  IMAGE_NAME_FRONT: gourmetise-front
+  ENVIRONMENT: 'PROD'
+
+jobs:
+
+  pull:
+    runs-on: [self-hosted]
+
+    steps:
+      - name: pull Docker image node:22.19.0-alpine3.22
+        run: docker pull node:22.19.0-alpine3.22
+      - name: pull Docker image node:22.19.0
+        run: docker pull node:22.19.0
+
+
+  build:
+    needs: pull
+    runs-on: [self-hosted]
+
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build the Docker image
+        run: |
+          docker build . -t ${IMAGE_NAME_FRONT} 
+
+# step lint et prettier docker run --rm -i ${IMAGE_NAME_FRONT} npm run lint et docker run --rm -i ${IMAGE_NAME_FRONT} npm run format:check
+
+  deploy:
+    needs: build
+    runs-on: [self-hosted]
+
+    steps:
+      - name: kill Docker Compose
+        run: docker compose rm -s -f || true 2> /dev/null
+
+      - name: reRun Docker Compose
+        run: docker compose up -d

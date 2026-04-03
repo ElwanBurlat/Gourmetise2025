@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="ca1c372b-06d1-4d1a-b33a-51f4933bed2e" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/runner/docker-compose.yml" afterDir="false" />
-    </list>
+    <list default="true" id="ca1c372b-06d1-4d1a-b33a-51f4933bed2e" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -131,7 +129,7 @@
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "git-widget-placeholder": "Feature/eslint-prettier",
+    "git-widget-placeholder": "Feature/esLint-prettier",
     "last_opened_file_path": "C:/laragon/www/burlat/Gourmetise/GourmetiseAPI",
     "nodejs_package_manager_path": "npm",
     "settings.editor.selected.configurable": "project.propVCSSupport.Confirmation",
