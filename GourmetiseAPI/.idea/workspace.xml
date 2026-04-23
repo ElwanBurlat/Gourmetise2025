@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="ca1c372b-06d1-4d1a-b33a-51f4933bed2e" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/runner/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/runner/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../workflow/deploiement-front-vue.yaml" beforeDir="false" />
-    </list>
+    <list default="true" id="ca1c372b-06d1-4d1a-b33a-51f4933bed2e" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -172,7 +168,7 @@
       <workItem from="1773388956821" duration="1859000" />
       <workItem from="1773994745951" duration="1917000" />
       <workItem from="1775198080092" duration="3429000" />
-      <workItem from="1776928047896" duration="3721000" />
+      <workItem from="1776928047896" duration="4612000" />
     </task>
     <servers />
   </component>
