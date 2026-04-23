@@ -6,7 +6,7 @@ services:
     environment:
       REPO_URL: https://github.com/ElwanBurlat/Gourmetise2025.git
       RUNNER_NAME: Gourmetise2025
-      RUNNER_TOKEN: BOWUTNUMGH5UYSDT5VVDGG3JZ5YXE
+      RUNNER_TOKEN: BOWUTNWEUJIYLYE7AXIOPT3JZ53OC
       RUNNER_WORKDIR: /tmp/runner/work
       RUNNER_SCOPE: 'repo'
       LABELS: linux,x64,gpu
