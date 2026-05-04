@@ -121,6 +121,36 @@ class APIEvaluationController extends AbstractController
         return $this->json($evaluation, Response::HTTP_OK, []);
     }
 
+    #[Route('/api/evaluation/{siret}', methods: ["GET"])]
+    #[OA\Get(
+        path: "/api/evaluation/{siret}",
+        summary: "Données des évaluations selon le siret",
+        tags: ["EvaluationsById"],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Evaluations crées"
+            )
+        ]
+    )]
+    public function getEvaluationById(
+        ContestParamsRepository $contestParamsRepository,
+        EvaluationRepository $repository,
+        string $siret
+    ) : JsonResponse
+    {
+        $evaluation = $repository->findScoreById($siret);
+        $contestParams = $contestParamsRepository->find(1);
+
+        if ($contestParams->getStatus() !== Status::FINISHED) {
+            return new JsonResponse(
+                ['message' => 'Status not correct'],
+                Response::HTTP_BAD_REQUEST
+            );
+        }
+        return $this->json($evaluation, Response::HTTP_OK, []);
+    }
+
 
 
 }
