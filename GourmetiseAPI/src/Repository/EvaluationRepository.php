@@ -38,6 +38,24 @@ class EvaluationRepository extends ServiceEntityRepository
             ->getArrayResult();
     }
 
+    public function findScoreById(string $siret): array
+    {
+        return $this->createQueryBuilder('e')
+            ->join('e.bakery', 'b')
+            ->select(
+                'b.siret AS bakery_siret',
+                'b.companyName AS company_name',
+                'SUM(e.welcome) / COUNT(e.id) AS note_w',
+                'SUM(e.shopPresentation) / COUNT(e.id) AS note_s',
+                'SUM(e.productQuality) / COUNT(e.id) AS note_p',
+                '(SUM(e.welcome) + SUM(e.shopPresentation) + SUM(e.productQuality)) / (COUNT(e.id) * 3) AS moyenne'
+            )
+            ->where('b.siret = :siret')
+            ->setParameter('siret', $siret)
+            ->getQuery()
+            ->getArrayResult();
+    }
+
     //    /**
     //     * @return Evaluation[] Returns an array of Evaluation objects
     //     */

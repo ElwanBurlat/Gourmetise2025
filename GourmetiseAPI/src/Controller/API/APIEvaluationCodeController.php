@@ -8,6 +8,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Request;
 use App\Repository\EvaluationCodeRepository;
 
+use OpenApi\Attributes as OA;
+#[OA\Tag(name: "EvaluationCodes")]
 final class APIEvaluationCodeController extends AbstractController
 {
 

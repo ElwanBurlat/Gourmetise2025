@@ -12,9 +12,22 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 
+use OpenApi\Attributes as OA;
+#[OA\Tag(name: "ContestParams")]
 class APIContestParamsController extends AbstractController
 {
     #[Route('/api/contestParams', methods :["GET"])]
+    #[OA\Get(
+        path: "/api/contestParams",
+        summary: "Obtenir les paramètres du concours",
+        tags: ["ContestParams"],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Données du concours"
+            )
+        ]
+    )]
     public function getContestParams(ContestParamsRepository $repository) : JsonResponse
     {
         $contestParams = $repository->find(1);
@@ -22,34 +35,56 @@ class APIContestParamsController extends AbstractController
     }
 
     #[Route('/api/contestParams', methods :["POST"])]
+    #[OA\Post(
+        path: "/api/contestParams",
+        summary: "Créer les paramètres du concours",
+        tags: ["ContestParams"],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Concours crée"
+            )
+        ]
+    )]
     public function createContestParams(
-        Request $request, 
+        Request $request,
         EntityManagerInterface $entityManager,
         SerializerInterface $serializer
     ) : JsonResponse
     {
         // récupérer le contenu JSON de la requête
         $data = $request->getContent();
-        
+
         try {
             // désérialiser le JSON en une instance de l'entité ContestParams
             $contestParams = $serializer->deserialize($data, ContestParams::class, 'json', ['groups' => 'ContestParams:Write']);
             // enregistrer le ContestParams dans la base de données
             $entityManager->persist($contestParams);
             $entityManager->flush();
-            
+
             // envoyer réponse de succès de la création
             return new JsonResponse(['message'=>'ContestParams created'], Response::HTTP_CREATED);
-        } 
+        }
         catch (\Exception $e) {
-            
+
             return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
         }
     }
 
     #[Route('/api/contestParams', methods :["PUT", "PATCH"])]
+    #[OA\Put(
+        path: "/api/contestParams",
+        summary: "Modifier les paramètres du concours",
+        tags: ["ContestParams"],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Données du concours modifié "
+            )
+        ]
+    )]
     public function updateContestParams(
-        Request $request, 
+        Request $request,
         EntityManagerInterface $entityManager,
         SerializerInterface $serializer
     ) : JsonResponse
@@ -63,8 +98,8 @@ class APIContestParamsController extends AbstractController
         $data = $request->getContent();
         try {
             // désérialiser le JSON et mise à jour de l'entité ContestParams
-            $serializer->deserialize($data, ContestParams::class, 'json', 
-                                     ['object_to_populate' => $contestParams, 
+            $serializer->deserialize($data, ContestParams::class, 'json',
+                                     ['object_to_populate' => $contestParams,
                                      'groups' => 'ContestParams:Update']);
             // enregistrer le concurrent modifié dans la base de données
             $entityManager->flush();
@@ -77,6 +112,17 @@ class APIContestParamsController extends AbstractController
     }
 
     #[Route('/api/contestParams', methods :["DELETE"])]
+    #[OA\Delete(
+        path: "/api/contestParams",
+        summary: "Supprimer les paramètres du concours",
+        tags: ["ContestParams"],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Données du concours supprimé"
+            )
+        ]
+    )]
     public function deleteContestParams(EntityManagerInterface $entityManager) : JsonResponse
     {
         // récupère l'entité à supprimer

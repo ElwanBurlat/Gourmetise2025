@@ -197,7 +197,7 @@ class MainActivity : ComponentActivity() {
                                                     obj.put("welcome", e.welcome)
                                                     obj.put("shopPresentation", e.shopPresentation)
                                                     obj.put("productQuality", e.productQuality)
-                                                    obj.put("bakery_id", e.bakery_id)
+                                                    obj.put("bakery", e.bakery_id)
                                                     fluxJSON.put(obj)
                                                 }
                                                 Log.i("Données envoyées", fluxJSON.toString())

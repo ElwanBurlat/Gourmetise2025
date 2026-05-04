@@ -15,12 +15,24 @@ use Symfony\Component\Serializer\SerializerInterface;
 use App\Entity\User;
 use App\Enum\Status;
 use App\Repository\ContestParamsRepository;
+use OpenApi\Attributes as OA;
 
-
+#[OA\Tag(name: "BakeryRegistrations")]
 final class APIBakeryController extends AbstractController
 {
 
     #[Route('/api/bakery', methods :["GET"])]
+    #[OA\Get(
+        path: "/api/bakery",
+        summary: "Obtenir les boulangerie",
+        tags: ["BakeryRegistrations"],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Boulangeries récupérés"
+            )
+        ]
+    )]
     public function getbakery(
         ContestParamsRepository $contestParamsRepository,
         BakeryRepository $repository
@@ -39,6 +51,17 @@ final class APIBakeryController extends AbstractController
     }
 
     #[Route('/api/bakery', methods :["POST"])]
+    #[OA\Post(
+        path: "/api/bakery",
+        summary: "Crée une boulangerie",
+        tags: ["BakeryRegistrations"],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Boulangerie crée"
+            )
+        ]
+    )]
     public function createbakery(
         Request $request,
         EntityManagerInterface $entityManager,
