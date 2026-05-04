@@ -25,6 +25,7 @@ class GourmetiseDAO (context : Context) {
         maBase.insert("Evaluation", null, e)
 
     }
+
     fun nombreDEvaluations(): Int {
         val cursor = maBase.rawQuery("SELECT COUNT(*) FROM EVALUATION", null)
         cursor.moveToFirst()
@@ -67,6 +68,25 @@ class GourmetiseDAO (context : Context) {
         cursor.close()
         return liste
     }
+
+    fun getEvaluation(siret: String): Evaluation? {
+        val cursor = maBase.rawQuery("SELECT * FROM Evaluation WHERE siret=?", arrayOf(siret))
+
+        if (cursor.moveToFirst()) {
+            val e = Evaluation()
+            e.code             = cursor.getString(cursor.getColumnIndexOrThrow("code"))
+            e.welcome          = cursor.getFloat(cursor.getColumnIndexOrThrow("welcome"))
+            e.shopPresentation = cursor.getFloat(cursor.getColumnIndexOrThrow("shopPresentation"))
+            e.productQuality   = cursor.getFloat(cursor.getColumnIndexOrThrow("productQuality"))
+            e.bakery_id        = cursor.getString(cursor.getColumnIndexOrThrow("siret"))
+            cursor.close()
+            return e
+        }
+
+        cursor.close()
+        return null
+    }
+
     fun supprimerToutesLesBakery() {
         maBase.delete("Bakery", null, null)
     }
