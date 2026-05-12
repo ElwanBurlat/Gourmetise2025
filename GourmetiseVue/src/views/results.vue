@@ -56,8 +56,12 @@
         </table>
       </div>
       <div class="btn-group">
-        <v-btn color="primary" @click="fetchGet">Générer les résultats</v-btn>
-        <v-btn color="success" @click="published">Publier le résultat</v-btn>
+        <div v-if="resultatContestParam?.statusLabel === 'Terminé'">
+          <v-btn color="primary" @click="fetchGet">Générer les résultats</v-btn>
+        </div>
+        <div v-if="isGenerated">
+          <v-btn color="success" @click="published">Publier le résultat</v-btn>
+        </div>
       </div>
     </template>
     <template v-if="isBaker">
@@ -203,10 +207,12 @@ const siret = ref(localStorage.getItem("idBakery"));
 const publish = ref(localStorage.getItem("isPublished") === "true");
 const resultatAPI = ref(JSON.parse(localStorage.getItem("resultatData")) || []);
 const resultatBySiret = ref(null);
+const resultatContestParam = ref(null);
+const isGenerated = ref(false);
 
 onMounted(() => {
-  fetchGet();
   getResultatBySiret();
+  getContestParam();
 });
 
 const classement = computed(() => {
@@ -226,6 +232,7 @@ async function fetchGet() {
   try {
     const response = await axios.get("http://localhost:8000/api/evaluation");
     resultatAPI.value = response.data;
+    isGenerated.value = true;
   } catch (error) {
     console.error(error);
   }
@@ -237,6 +244,15 @@ async function getResultatBySiret() {
       `http://localhost:8000/api/evaluation/${siret.value}`,
     );
     resultatBySiret.value = response.data[0];
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function getContestParam() {
+  try {
+    const response = await axios.get("http://localhost:8000/api/contestParams");
+    resultatContestParam.value = response.data;
   } catch (error) {
     console.error(error);
   }
