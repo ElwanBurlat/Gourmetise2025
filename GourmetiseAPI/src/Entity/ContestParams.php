@@ -28,7 +28,11 @@ class ContestParams
     #[ORM\Column(enumType: Status::class, nullable: false, options: ["default" => "not_opened"])]
     private ?Status $status = Status::NOT_OPENED;
 
-    
+    #[ORM\Column(type: 'boolean', options: ["default" => false])]
+    #[Groups(['ContestParams:Read', 'ContestParams:Write', 'ContestParams:Update'])]
+    private bool $isPublished = false;
+
+
     public function getId(): ?int
     {
         return $this->id;
@@ -76,4 +80,15 @@ class ContestParams
         return $this->status->label();
     }
 
+
+    public function isPublished(): bool
+    {
+        return $this->isPublished;
+    }
+
+    public function setIsPublished(bool $isPublished): static
+    {
+        $this->isPublished = $isPublished;
+        return $this;
+    }
 }

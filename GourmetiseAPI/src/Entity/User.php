@@ -30,7 +30,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $email = null;
 
     #[Groups(['User:Write'])]
-    #[ORM\Column(length: 50)]
+    #[ORM\Column(length: 255)]
     private ?string $passwordHash = null;
 
     #[Groups(['User:Write'])]
@@ -92,7 +92,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setPasswordHash(string $password): static
     {
-        $this->passwordHash = $password;
+        $this->passwordHash = password_hash($password, PASSWORD_BCRYPT);
 
         return $this;
     }

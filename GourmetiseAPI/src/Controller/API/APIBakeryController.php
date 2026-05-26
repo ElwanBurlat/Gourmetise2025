@@ -115,4 +115,13 @@ final class APIBakeryController extends AbstractController
         }
     }
 
+    #[Route('/api/bakery/user/{id}', methods: ["GET"])]
+    public function getBakeryByUser(int $id, BakeryRepository $repository): JsonResponse
+    {
+        $bakery = $repository->findOneBy(['bakeryUser' => $id]);
+        $exists = $bakery !== null;
+        return new JsonResponse(['exists' => $exists], Response::HTTP_OK);
+
+    }
+
 }

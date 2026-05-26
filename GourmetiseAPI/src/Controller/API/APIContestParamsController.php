@@ -137,4 +137,22 @@ class APIContestParamsController extends AbstractController
         // retourne une réponse HTTP 204 No Content
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
+
+    #[Route('/api/contestParams/publish', methods: ["PATCH"])]
+    public function publishContestParams(EntityManagerInterface $entityManager): JsonResponse
+    {
+        $contestParams = $entityManager->getRepository(ContestParams::class)->find(1);
+
+        if (!$contestParams) {
+            return new JsonResponse(['message' => 'ContestParams not exist'], Response::HTTP_NOT_FOUND);
+        }
+
+        $contestParams->setIsPublished(!$contestParams->isPublished()); // toggle true/false
+        $entityManager->flush();
+
+        return new JsonResponse([
+            'message' => 'Publication mise à jour',
+            'isPublished' => $contestParams->isPublished()
+        ], Response::HTTP_OK);
+    }
 }

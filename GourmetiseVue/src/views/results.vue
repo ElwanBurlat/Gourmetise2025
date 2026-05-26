@@ -56,11 +56,18 @@
         </table>
       </div>
       <div class="btn-group">
-        <div v-if="resultatContestParam?.statusLabel === 'Terminé'">
+        <div
+          v-if="resultatContestParam?.statusLabel === 'Terminé' && !isGenerated"
+        >
           <v-btn color="primary" @click="fetchGet">Générer les résultats</v-btn>
         </div>
-        <div v-if="isGenerated">
+        <div v-if="isGenerated && !publish">
           <v-btn color="success" @click="published">Publier le résultat</v-btn>
+        </div>
+        <div v-if="publish">
+          <v-chip color="success" prepend-icon="mdi-check-circle">
+            Concours déjà publié
+          </v-chip>
         </div>
       </div>
     </template>
@@ -198,17 +205,18 @@
 import axios from "axios";
 import { ref, computed, onMounted } from "vue";
 
-const userRole = ref(localStorage.getItem("role"));
+const userData = JSON.parse(localStorage.getItem("user"));
+const userRole = ref(userData?.role || null);
 const isAdmin = computed(() => userRole.value === "ROLE_ADMIN");
 const isBaker = computed(() => userRole.value === "ROLE_BAKER");
 const isVisitor = computed(() => !isAdmin.value && !isBaker.value);
 const siret = ref(localStorage.getItem("idBakery"));
 
-const publish = ref(localStorage.getItem("isPublished") === "true");
+const publish = ref(false);
 const resultatAPI = ref(JSON.parse(localStorage.getItem("resultatData")) || []);
 const resultatBySiret = ref(null);
 const resultatContestParam = ref(null);
-const isGenerated = ref(false);
+const isGenerated = ref(resultatAPI.value.length > 0);
 
 onMounted(() => {
   getResultatBySiret();
@@ -222,10 +230,23 @@ const classement = computed(() => {
   return index !== -1 ? index + 1 : "N/A";
 });
 
-function published() {
-  publish.value = !publish.value;
-  localStorage.setItem("isPublished", publish.value);
-  localStorage.setItem("resultatData", JSON.stringify(resultatAPI.value));
+async function getContestParam() {
+  try {
+    const response = await axios.get("http://localhost:8000/api/contestParams");
+    resultatContestParam.value = response.data;
+    publish.value = response.data.isPublished;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function published() {
+  try {
+    await axios.patch("http://localhost:8000/api/contestParams/publish");
+    publish.value = !publish.value;
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 async function fetchGet() {
@@ -244,15 +265,6 @@ async function getResultatBySiret() {
       `http://localhost:8000/api/evaluation/${siret.value}`,
     );
     resultatBySiret.value = response.data[0];
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-async function getContestParam() {
-  try {
-    const response = await axios.get("http://localhost:8000/api/contestParams");
-    resultatContestParam.value = response.data;
   } catch (error) {
     console.error(error);
   }

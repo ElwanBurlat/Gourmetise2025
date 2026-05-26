@@ -45,10 +45,55 @@ final class APIUserController extends AbstractController
             $entityManager->flush(); //executer les operations pour rentrer l'objet dans la BDD
 
             // envoyer réponse de succès de la création
-            return new JsonResponse(['message'=>'User created'], Response::HTTP_CREATED);
+            return new JsonResponse(['message'=>'User created',
+                'id' => $user->getId()
+            ], Response::HTTP_CREATED);
         }
         catch (\Exception $e) {
             return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
         }
     }
+    #[Route('/api/login', methods: ["POST"])]
+    #[OA\Post(
+        path: "/api/login",
+        summary: "Connecter un utilisateur",
+        tags: ["User"],
+        responses: [
+            new OA\Response(response: 200, description: "Connexion réussie"),
+            new OA\Response(response: 401, description: "Identifiants incorrects")
+        ]
+    )]
+    public function login(
+        Request $request,
+        UserRepository $userRepository,
+        EntityManagerInterface $entityManager,
+    ): JsonResponse {
+        $data = json_decode($request->getContent(), true);
+
+        $email = $data['email'] ;
+        $password = $data['password'] ;
+
+        if (!$email || !$password) {
+            return new JsonResponse(['message' => 'Champs manquants'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $user = $userRepository->findOneBy(['email' => $email]);
+
+        if (!$user) {
+            return new JsonResponse(['message' => 'Email ou mot de passe incorrect'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        if (!password_verify($password, $user->getPasswordHash())) {
+            return new JsonResponse(['message' => 'Email ou mot de passe incorrect'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        return new JsonResponse([
+            'id' => $user->getId(),
+            'firstName' => $user->getFirstName(),
+            'lastName' => $user->getLastName(),
+            'email' => $user->getEmail(),
+            'role' => $user->getRole(),
+        ], Response::HTTP_OK);
+    }
+
 }
