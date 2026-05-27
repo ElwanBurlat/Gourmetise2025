@@ -84,6 +84,7 @@ const fetchPosts = async () => {
     localStorage.setItem(
       "user",
       JSON.stringify({
+        id: response.data.id,
         lastName: lastName.value,
         firstName: firstName.value,
         email: email.value,

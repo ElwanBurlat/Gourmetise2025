@@ -4,11 +4,11 @@
             <v-col>
                  <v-card elevation="8" class="rounded-xl pa-4" style="min-width: 500px;">
 
-                
+
                 <v-card-title class="text-h5 d-flex align-center justify-space-between">
                     <span>{{ title }}</span>
                     <v-chip color="primary" class="text-white"
-                    
+
                     size="small"
                     >
                     {{ status }}
@@ -16,7 +16,7 @@
                 </v-card-title>
 
                 <v-divider class="my-2"></v-divider>
-                
+
                 <v-card-text class="text-body-1">
                     {{ description }}
                 </v-card-text>
@@ -68,7 +68,7 @@
 
     </v-container>
 
-    
+
 </template>
 <script setup >
 import { ref } from 'vue';

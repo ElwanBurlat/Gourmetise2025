@@ -49,11 +49,41 @@
 <script setup>
 import { useRouter } from "vue-router";
 import axios from "axios";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 const router = useRouter();
 const user = ref(JSON.parse(localStorage.getItem("user")));
 const hasBakery = ref(false);
 
+const INACTIVITY_LIMIT = 30 * 60 * 1000;
+let inactivityTimer = null;
+
+const resetTimer = () => {
+  clearTimeout(inactivityTimer);
+  inactivityTimer = setTimeout(() => {
+    if (user.value) {
+      localStorage.removeItem("user");
+      user.value = null;
+      router.push("/connection");
+    }
+  }, INACTIVITY_LIMIT);
+};
+
+onMounted(() => {
+  window.addEventListener("mousemove", resetTimer);
+  window.addEventListener("keydown", resetTimer);
+  window.addEventListener("click", resetTimer);
+  window.addEventListener("scroll", resetTimer);
+
+  resetTimer();
+});
+
+onUnmounted(() => {
+  window.removeEventListener("mousemove", resetTimer);
+  window.removeEventListener("keydown", resetTimer);
+  window.removeEventListener("click", resetTimer);
+  window.removeEventListener("scroll", resetTimer);
+  clearTimeout(inactivityTimer);
+});
 onMounted(async () => {
   console.log("id user :", user.value?.id);
   if (user.value?.role === "ROLE_BAKER") {
