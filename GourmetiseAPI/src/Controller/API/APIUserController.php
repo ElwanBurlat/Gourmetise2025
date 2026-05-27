@@ -39,7 +39,8 @@ final class APIUserController extends AbstractController
         try {
             // désérialiser le JSON en une instance de l'entité ContestParams
             $user = $serializer->deserialize($data, User::class, 'json', ['groups' => 'User:Write']);
-
+            $user->setDataConsent(new \DateTimeImmutable());
+            $user->setDataDecline(null);
             // enregistrer le Bakery dans la base de données
             $entityManager->persist($user); //Pour preparer la sauvegarde de  cet objet dans la bdd
             $entityManager->flush(); //executer les operations pour rentrer l'objet dans la BDD

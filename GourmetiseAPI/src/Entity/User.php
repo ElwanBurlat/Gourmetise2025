@@ -37,6 +37,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 50)]
     private ?string $role = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $data_consent = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $data_decline = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -131,5 +137,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRoles(): array
     {
         throw new \Exception('Not implemented');
+    }
+
+    public function getDataConsent(): ?\DateTimeImmutable
+    {
+        return $this->data_consent;
+    }
+
+    public function setDataConsent(?\DateTimeImmutable $data_consent): static
+    {
+        $this->data_consent = $data_consent;
+        return $this;
+    }
+
+    public function getDataDecline(): ?\DateTimeImmutable
+    {
+        return $this->data_decline;
+    }
+
+    public function setDataDecline(?\DateTimeImmutable $data_decline): static
+    {
+        $this->data_decline = $data_decline;
+        return $this;
     }
 }
